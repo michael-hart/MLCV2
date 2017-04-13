@@ -29,12 +29,9 @@ function [ points ] = harris( img, thresh )
     % Calculate Harris corner measure, with epsilon in denominator to 
     % prevent divide-by-zero
     harris = (Ixx.*Iyy - Ixy.^2)./(Ixx + Iyy + eps);
-    
-    % Take Hessian determinant
-    hess = (Ixx .* Iyy) - (Ixy .* Ixy);
 
     % Compare to a threshold
-    N = sum(sum(hess > thresh));
+    N = sum(sum(harris > thresh));
     points = zeros(2, N);
 
     n = 1;

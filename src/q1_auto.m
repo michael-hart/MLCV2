@@ -1,29 +1,44 @@
 % File for detecting interest points in image
 
-showImg = false;
+showImg = true;
 
 % Load image
 imgA = imread('img1.pgm');
 
-% Perform image detection - 3e7 works well from testing
-% hess = hessian(imgA, 3e7);
-
 % Perform Harris corner detection - 2500 works well from testing
-harr = harris(imgA, 2500);
+harrisA = harris(imgA, 2500);
 
 % Overlay interest points on image to evaluate
 if showImg
     figure(1);
     imshow(imgA);
     hold on;
-    scatter(hess(1, :), hess(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
-
-    figure(2);
-    imshow(imgA);
-    hold on;
-    scatter(harr(1, :), harr(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
+    scatter(harrisA(1, :), harrisA(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
 end
 
 % Take output interest point matrix and get the descriptors
-descriptors = describe(imgA, harr);
-descriptors(end-2:end, :)
+describeA = describe(imgA, harrisA);
+
+% Get features and descriptors for image B
+imgB = imread('img2.pgm');
+harrisB = harris(imgB, 2500);
+describeB = describe(imgB, harrisB);
+
+% Match using Nearest Neighbour
+matches = matchPatches(describeA, describeB);
+% Got 77 matches between images!
+
+% Estimate a transformation based on the matches between A and B
+% Based on matched patches, build two matrices of co-ordinates
+nMatch = size(matches, 2);
+coordA = zeros(2, nMatch);
+coordB = zeros(2, nMatch);
+
+for i=1:nMatch
+    n = matches(1, i);
+    m = matches(2, i);
+    coordA(:, i) = harrisA(:, n);
+    coordB(:, i) = harrisB(:, m);
+end
+
+save('res/auto_out.mat', 'coordA', 'coordB', 'imgA', 'imgB');

@@ -13,8 +13,8 @@ desc = zeros(M, N);
 % Get patch represented by pixel
 % Use min with image dimensions to ensure entire patch
 [height, width] = size(img);
-minHeight = height - 31
-minWidth = width - 31
+minHeight = height - 31;
+minWidth = width - 31;
 
 for i=1:N
     point = points(:, i);

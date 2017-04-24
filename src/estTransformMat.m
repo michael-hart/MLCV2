@@ -1,4 +1,4 @@
-function [ transformMat ] = estTransformMat2( coordA, coordB )
+function [ transformMat ] = estTransformMat( coordA, coordB )
 %ESTTRANSFORMMAT Estimates transformation matrix from A to B
 %   Uses matched co-ordinate pairs in coordA, coordB
 %   coordA and coordB are 2xN matrices, N the same for both
@@ -31,12 +31,12 @@ err = zeros(1, size(V, 2));
 for i=1:size(V, 2)
     h = reshape(V(:, i) ./ V(9, i), 3, 3)';
     for j=1:size(coordA, 2)
-        xa = coordA(1, i);
-        ya = coordA(2, i);
-        xb = coordB(1, i);
-        yb = coordB(2, i);
-        err(i) = err(i) + sum([xa; ya; 1] - (h * [xb; yb; 1]));
-        disp(['Error for ' num2str(i) ' is ' num2str(err(i))]);
+        xa = coordA(1, j);
+        ya = coordA(2, j);
+        xb = coordB(1, j);
+        yb = coordB(2, j);
+        err(i) = err(i) + sum(abs([xa; ya; 1] - (h * [xb; yb; 1])));
+%         disp(['Error for ' num2str(i) ' is ' num2str(err(i))]);
     end
 end
 
@@ -45,6 +45,7 @@ h_unscaled = V(:, minCol);
 
 h_scaled = h_unscaled ./ h_unscaled(end);
 transformMat = reshape(h_scaled, 3, 3)';
+disp(transformMat);
 
 end
 

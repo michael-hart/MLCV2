@@ -14,6 +14,7 @@ if showImg
     imshow(imgA);
     hold on;
     scatter(harrisA(1, :), harrisA(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
+    hold off;
 end
 
 % Take output interest point matrix and get the descriptors
@@ -41,4 +42,8 @@ for i=1:nMatch
     coordB(:, i) = harrisB(:, m);
 end
 
-save('res/auto_out.mat', 'coordA', 'coordB', 'imgA', 'imgB');
+if ismac
+    save('../res/auto_out.mat', 'coordA', 'coordB', 'imgA', 'imgB');
+else
+    save('res/auto_out.mat', 'coordA', 'coordB', 'imgA', 'imgB');
+end

@@ -10,7 +10,7 @@ harrisA = harris(imgA, 2500);
 
 % Overlay interest points on image to evaluate
 if showImg
-    figure(1);
+    figure;
     imshow(imgA);
     hold on;
     scatter(harrisA(1, :), harrisA(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
@@ -23,6 +23,16 @@ describeA = describe(imgA, harrisA);
 % Get features and descriptors for image B
 imgB = imread('img2.pgm');
 harrisB = harris(imgB, 2500);
+
+% Overlay interest points on image to evaluate
+if showImg
+    figure;
+    imshow(imgB);
+    hold on;
+    scatter(harrisB(1, :), harrisB(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
+    hold off;
+end
+
 describeB = describe(imgB, harrisB);
 
 % Match using Nearest Neighbour

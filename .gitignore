@@ -1,4 +1,5 @@
 *.pdf
 *.sh
-
+auto_out.mat
 *.m~
+test*.m

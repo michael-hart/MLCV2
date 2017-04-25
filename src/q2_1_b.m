@@ -13,26 +13,23 @@ manualB = [xB; yB];
 load('auto_out.mat');
 
 %% Estimate transformation matrices
-transformMatAuto = estTransformMat2(coordA, coordB);
-transformMatManual = estTransformMat2(manualA, manualB);
-
+transformMatAuto = estTransformMat(coordA, coordB);
+transformMatManual = estTransformMat(manualA, manualB);
 %% Warp Images!
-transformAuto = projective2d(transformMatAuto);
-imgABAuto = imwarp(imgB, transformAuto);
-transformManual = projective2d(transformMatManual);
-imgABManual = imwarp(imgB, transformManual);
+transformAuto = affine2d(transformMatAuto');
+[imgABAuto, refAuto] = imwarp(imgA, transformAuto);
+transformManual = affine2d(transformMatManual');
+[imgABManual, refManual] = imwarp(imgA, transformManual);
 
 %% Display
 figure('position', [0 0 1280 800]);
 subplot(2, 2, 1);
-imshow(imgABAuto);
-subplot(2, 2, 2);
-imshow(imgABManual);
-subplot(2, 2, 3);
 imshow(imgA);
-subplot(2, 2, 4);
+subplot(2, 2, 2);
 imshow(imgB);
-
-
+subplot(2, 2, 3);
+imshowpair(imgB, imref2d(size(imgA)), imgABAuto, refAuto);
+subplot(2, 2, 4);
+imshowpair(imgB, imref2d(size(imgA)), imgABManual, refManual);
 
 

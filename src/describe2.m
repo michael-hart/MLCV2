@@ -10,16 +10,21 @@ function [ desc ] = describe2( img, points )
     M = 256;
     desc = zeros(M, N);
 
+    % Patch size
+    patchSize = 32;
+    offset = floor(patchSize/2);
+    offset_tau = floor((patchSize - 1)/2);
+    
     % Pad image
-    img = padarray(img, [16, 16], 'replicate');
+    img = padarray(img, [offset, offset], 'replicate');
     % Offset points (1, 1) should become (17, 17);
-    points = points + 16;
+    points = points + offset;
     
     % Get patch represented by pixel
     for index=1:N
         h = points(2, index);
         w = points(1, index);
-        patch = img(h-15:h+16, w-15:w+16);
+        patch = img(h-offset_tau:h+offset, w-offset_tau:w+offset);
 
         % Get the histogram of the patch
         descriptor = imhist(patch);

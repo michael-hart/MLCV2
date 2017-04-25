@@ -30,7 +30,5 @@ function [ transformMat, V ] = estTransformMat( coordA, coordB )
     transformMat = reshape(V(:, 9) ./ V(9, 9), 3, 3)';
     % h31 and h32 are 0 for non-projections. 
     transformMat(3, 1:2) = [0, 0];
-    disp(transformMat);
-
 end
 

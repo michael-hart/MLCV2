@@ -29,11 +29,6 @@ scatter(harrisReduced(1, :), harrisReduced(2, :), 50, 'x', 'MarkerEdgeColor', 'b
 hold off;
 
 %% Compare
-% Get into n x 2 style.
-harrisNormal = harrisNormal';
-harrisReduced = 2 * harrisReduced';
-
-harrisCompare = nearestNeighbour(harrisNormal, harrisReduced);
-error = errorHA(harrisNormal, harrisCompare);
-disp(error);
+harrisCompare = nearestNeighbour(harrisNormal, 2 * harrisReduced);
+error = errorHA(harrisNormal, harrisCompare, eye(3));
 

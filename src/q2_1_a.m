@@ -31,7 +31,7 @@ hold off;
 %% Compare
 % Get into n x 2 style.
 harrisNormal = harrisNormal';
-harrisReduced = harrisReduced';
+harrisReduced = 2 * harrisReduced';
 
 harrisCompare = nearestNeighbour(harrisNormal, harrisReduced);
 error = errorHA(harrisNormal, harrisCompare);

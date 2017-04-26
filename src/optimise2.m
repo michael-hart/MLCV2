@@ -1,4 +1,4 @@
-function [ coordOptA, coordOptB ] = optimise2( coordA, coordB )
+function [ coordOptA, coordOptB ] = optimise2( coordA, coordB, ratio)
 %OPTIMISE Remove outliers from coordinate pairs
 %   IN: coordA, coordB, transform. 2xN
 %   OUT: coordAOpt, coordBOpt, 2xM
@@ -16,13 +16,13 @@ function [ coordOptA, coordOptB ] = optimise2( coordA, coordB )
     coordOptA = coordA;
     coordOptB = coordB;
     
-    while (unoptimised && oldTotal > 4 && oldTotal > 0.3 * N)
+    while (unoptimised && oldTotal > 3 && oldTotal > ratio * N)
+        disp('-');
         % Storage and baseline
         error = zeros(1, oldTotal);
-        transformBase = estTransformMat(coordOptA, coordOptB);    
-        baseError = errorHA(coordOptA, coordOptB, transformBase);
-        disp(['baseError: ', num2str(baseError)]);
-        
+%         transformBase = estTransformMat(coordOptA, coordOptB);    
+        baseError = errorHA(coordOptA, coordOptB, eye(3));
+        disp(baseError);
         % Each point
         for index = 1:oldTotal
             tempCoordA = coordOptA;
@@ -37,16 +37,16 @@ function [ coordOptA, coordOptB ] = optimise2( coordA, coordB )
         end
     
         % Check new values
-        disp(['error: ', num2str(error)]);
-        if sum(error > baseError) < 1
+        if sum(error < baseError) < 1
+            disp('Done.');
             unoptimised = false;
         else
-            [~, minIndex] = min(error);
-            disp(['Removing ', num2str(minIndex)]);
+            disp('Removing.');
+            [minVal, minIndex] = min(error);
+            disp(minVal);
             coordOptA(:, minIndex) = [];
             coordOptB(:, minIndex) = [];
             oldTotal = oldTotal - 1;
-            fprintf('\n');
         end
         
     end

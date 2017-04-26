@@ -1,4 +1,4 @@
-function [ coordOptA, coordOptB ] = optimise( coordA, coordB )
+function [ coordOptA, coordOptB ] = optimise( coordA, coordB, ratio )
 %OPTIMISE Remove outliers from coordinate pairs
 %   IN: coordA, coordB, transform. 2xN
 %   OUT: coordAOpt, coordBOpt, 2xM
@@ -44,7 +44,7 @@ function [ coordOptA, coordOptB ] = optimise( coordA, coordB )
         newTotal = sum(useful);
         
         % Only reduce if possible or if less. 
-        if (newTotal > 3 && newTotal ~= oldTotal)
+        if (newTotal > ratio * N && newTotal > 3 && newTotal ~= oldTotal)
             % Reduced
             coordOptA = coordOptA(:, useful);
             coordOptB = coordOptB(:, useful);

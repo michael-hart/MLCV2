@@ -1,12 +1,12 @@
 % File for detecting interest points in image
 
-showImg = true;
+showImg = false;
 
 % Load image
 imgA = imread('img1.pgm');
 
 % Perform Harris corner detection - 2500 works well from testing
-harrisA = harris(imgA, 2500);
+harrisA = harris(imgA, 3000);
 
 % Overlay interest points on image to evaluate
 if showImg
@@ -18,11 +18,11 @@ if showImg
 end
 
 % Take output interest point matrix and get the descriptors
-describeA = describe(imgA, harrisA);
+describeA = describe2(imgA, harrisA);
 
 % Get features and descriptors for image B
-imgB = imread('img2.pgm');
-harrisB = harris(imgB, 2500);
+imgB = imread('img3.pgm');
+harrisB = harris(imgB, 3000);
 
 % Overlay interest points on image to evaluate
 if showImg
@@ -33,7 +33,7 @@ if showImg
     hold off;
 end
 
-describeB = describe(imgB, harrisB);
+describeB = describe2(imgB, harrisB);
 
 % Match using Nearest Neighbour
 matches = matchPatches(describeA, describeB);
@@ -50,6 +50,14 @@ for i=1:nMatch
     m = matches(2, i);
     coordA(:, i) = harrisA(:, n);
     coordB(:, i) = harrisB(:, m);
+end
+
+% Display the matched points on the photos, superimposed. Method is MATLAB
+% Data is ours, obvs (well, boat stuff).
+if showImg
+    p1 = cornerPoints(coordA');
+    p2 = cornerPoints(coordB');
+    showMatchedFeatures(imgA, imgB, p1, p2);
 end
 
 if ismac

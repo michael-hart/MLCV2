@@ -7,7 +7,7 @@ function [ desc ] = describe2( img, points )
 
     % Create output matrix
     N = size(points, 2);
-    M = 256;
+    M = 64;
     desc = zeros(M, N);
 
     % Patch size
@@ -27,12 +27,12 @@ function [ desc ] = describe2( img, points )
         patch = img(h-offset_tau:h+offset, w-offset_tau:w+offset);
 
         % Get the histogram of the patch
-        descriptor = imhist(patch);
+        descriptor = imhist(patch, M);
 
         % Add the descriptor to the output matrix
         desc(:, index) = descriptor;
 
     end
-
+    
 end
 

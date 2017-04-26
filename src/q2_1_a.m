@@ -23,12 +23,22 @@ harrisReduced = harris(reducedImg, 2500);
 
 %% Display picture with points
 figure;
-imshow(reducedImg);
+imshow(imgNormal);
 hold on;
-scatter(harrisReduced(1, :), harrisReduced(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
+scatter(2*harrisReduced(1, :), 2*harrisReduced(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
 hold off;
 
 %% Compare
-harrisCompare = nearestNeighbour(harrisNormal, 2 * harrisReduced);
-error = errorHA(harrisNormal, harrisCompare, eye(3));
+% Nearest reduced point to actual point
+[ harrisCompare1, distances1 ] = nearestNeighbour(harrisNormal, 2 * harrisReduced);
+% Nearest actual point to reduced point
+[ harrisCompare2, distances2 ] = nearestNeighbour(2 * harrisReduced, harrisNormal);
+
+% The two errors
+error1 = errorHA(harrisNormal, harrisCompare1, eye(3));
+error2 = errorHA( 2*harrisReduced, harrisCompare2, eye(3));
+
+% The average
+disp(mean([error1 error2]));
+
 

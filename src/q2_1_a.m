@@ -3,17 +3,17 @@ clear;
 close all;
 if ismac
     addpath('../res/kitchen');
-    outputpath = ('../pic/');
+    outputpath = ('../');
 else
     addpath('res/kitchen');
-    outputpath = ('pic/');
+    outputpath = ('');
 end
 
 %% Generate data to use, normal image
 imgNormal = imread('HG1.pgm');
 
 % Perform Harris corner detection - 2500 works well from testing
-harrisNormal = harris(imgNormal, 1000);
+harrisNormal = harris(imgNormal, 500);
 
 %% Display picture with points
 figure;
@@ -23,13 +23,13 @@ scatter(harrisNormal(1, :), harrisNormal(2, :), 50, 'x', 'MarkerEdgeColor', 'blu
 hold off;
 fig = gcf;
 fig.PaperPositionMode = 'auto';
-print([outputpath, 'q2_1_a_imgNormal'],'-dpng','-r0');
+print([outputpath, 'pic/q2_1_a_imgNormal'],'-dpng','-r0');
 
 %% Generate data to use, reduced image
 imgReduced = imresize(imgNormal, 0.5);
 
 % Perform Harris corner detection - 2500 works well from testing
-harrisReduced = harris(imgReduced, 1000);
+harrisReduced = harris(imgReduced, 500);
 
 %% Display picture with points
 figure;
@@ -39,7 +39,7 @@ scatter(harrisReduced(1, :), harrisReduced(2, :), 50, 'x', 'MarkerEdgeColor', 'b
 hold off;
 fig = gcf;
 fig.PaperPositionMode = 'auto';
-print([outputpath, 'q2_1_a_imgReduced'],'-dpng','-r0');
+print([outputpath, 'pic/q2_1_a_imgReduced'],'-dpng','-r0');
 
 %% Display both sets of points together.
 % Normal image, with reduced points doubled to fit. 
@@ -51,7 +51,7 @@ scatter(2 * harrisReduced(1, :), 2 * harrisReduced(2, :), 50, 'x', 'MarkerEdgeCo
 hold off;
 fig = gcf;
 fig.PaperPositionMode = 'auto';
-print([outputpath, 'q2_1_a_imgBoth'],'-dpng','-r0');
+print([outputpath, 'pic/q2_1_a_imgBoth'],'-dpng','-r0');
 
 %% Match patches in same way, just use coordinates instead of features.
 [matches] = matchPatches(harrisNormal, 2 * harrisReduced);
@@ -71,16 +71,3 @@ end
 
 total = total/nMatch;
 disp(total)
-
-% %% Compare
-% % Nearest reduced point to actual point
-% [ harrisCompare1 ] = nearestNeighbour(harrisNormal, 2 * harrisReduced);
-% % Nearest actual point to reduced point
-% [ harrisCompare2 ] = nearestNeighbour(2 * harrisReduced, harrisNormal);
-% 
-% % The two errors
-% error1 = errorHA(harrisNormal, harrisCompare1, eye(3));
-% error2 = errorHA( 2*harrisReduced, harrisCompare2, eye(3));
-% 
-% % The average
-% disp(mean([error1 error2]));

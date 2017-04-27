@@ -40,5 +40,3 @@ error2 = errorHA( 2*harrisReduced, harrisCompare2, eye(3));
 
 % The average
 disp(mean([error1 error2]));
-
-

@@ -4,35 +4,23 @@ close all;
 addpath('../res');
 addpath('../res/boat');
 
-%% Load manual
-load('manualBoat.mat', 'xA', 'xB', 'yA', 'yB');
-load('man2.mat');
-manualA = [xA; yA];
-manualB = [xB; yB];
-
 %% Load previous variables from q1_auto.m; loads imgA, imgB, coordA, coordB
 load('auto_out.mat');
 
 %% Optimise
-optimise = 1;
+doRansac = true;
 showImg1 = false;
-showImg2 = false;
-showImg3 = true;
+showImg2 = true;
+showImg3 = false;
 
-if optimise == 1
-    [coordOptA, coordOptB] = myRANSAC(coordA, coordB, 1e5, 20);
-
-elseif optimise == 2
-    yes = [1, 2, 6, 7, 9, 10, 12, 14, 15, 16, 17];
-    coordOptA = coordA(:, yes);
-    coordOptB = coordB(:, yes);
-
+if doRansac
+    [coordOptA, coordOptB] = myRANSAC(coordA, coordB, 5e4, 20);
 else
     coordOptA = coordA;
     coordOptB = coordB;
 end
 
-%% Graph 
+%% Graph two pics, with unoptimised and optimised points.
 if showImg1
     figure('position', [0 0 1280 800]);
     subplot(2, 2, 1);
@@ -69,25 +57,23 @@ if showImg1
 end
 
 %% Estimate transformation matrices
-transformMatAuto = estTransformMat(coordOptA, coordOptB);
-transformMatManual = estTransformMat(manualA, manualB);
+transformMat = estTransformMat(coordOptA, coordOptB);
 
 % Translated points
 pointsAuto = zeros(size(coordOptA));
 for index = 1:size(coordOptA, 2)
-    temp = transformMatAuto * [coordOptA(1, index); coordOptA(2, index); 1];
+    temp = transformMat * [coordOptA(1, index); coordOptA(2, index); 1];
     pointsAuto(:, index) = temp(1:2);
 end
 
 %% Warp Images!
 % Transpose required, MATLAB convention
-transformAuto = affine2d(transformMatAuto');
-[imgABAuto, refAuto] = imwarp(imgA, transformAuto');
+transformA = projective2d(transformMat');
+[imgAB1, ref1] = imwarp(imgA, transformA');
 
-transformManual = affine2d(transformMatManual');
-[imgABManual, refManual] = imwarp(imgA, transformManual);
+[imgAB2, ref2] = projection(imgA, transformMat);
 
-%% Display
+% Display A, B, and B with A tranformed.
 if showImg2
     figure('position', [0 0 1280 800]);
 
@@ -100,15 +86,15 @@ if showImg2
     title('Image B');
 
     subplot(2, 2, 3);
-    imshowpair(imgB, imref2d(size(imgB)), imgABAuto, refAuto);
+    imshowpair(imgB, imref2d(size(imgB)), imgAB2, ref2);
     title('Image A, Transformed, Auto Features, over B.');
-
+    
     subplot(2, 2, 4);
-    imshowpair(imgB, imref2d(size(imgB)), imgABManual, refManual);
-    title('Image A, Transformed, Manual Features, over B.');
+    imshowpair(imgB, imref2d(size(imgB)), imgAB1, ref1);
+    title('Image A, Transformed, Auto Features, over B.');
 end
 
-%% Display
+%% Display A and B is used points. Finally, B, with transformed A, both with their points. 
 if showImg3
     figure('position', [0 0 1280 800]);
 
@@ -128,8 +114,8 @@ if showImg3
     text(coordOptB(1, :), coordOptB(2, :), cellstr(num2str([1:n]')), 'FontSize', 20, 'color', 'red' );
     hold off;
 
-    subplot(2, 2, 3);
-    imshowpair(imgB, imref2d(size(imgB)), imgABAuto, refAuto);
+    subplot(2, 2, [3, 4]);
+    imshowpair(imgB, imref2d(size(imgB)), imgAB, ref);
     hold on;
     
     scatter(coordOptB(1, :), coordOptB(2, :), 100, 'o', 'filled', 'blue');
@@ -141,19 +127,11 @@ if showImg3
     text(pointsAuto(1, :), pointsAuto(2, :), cellstr(num2str([1:n]')), 'FontSize', 20, 'color', 'green' );
     hold off;
     title('Image A, Transformed, Auto Features, over B.');
-
-    subplot(2, 2, 4);
-    imshowpair(imgB, imref2d(size(imgB)), imgABManual, refManual);
-    title('Image A, Transformed, Manual Features, over B.');
 end
 
 %% Display errors
-errorMan = errorHA(manualA, manualB, transformMatManual);
-errorAuto = errorHA(coordOptA, coordOptB, transformMatAuto);
-errorManBefore = errorHA(manualA, manualB, eye(3));
-errorAutoBefore = errorHA(coordA, coordB, eye(3));
-disp(errorManBefore);
-disp(errorMan);
-disp(errorAutoBefore);
-disp(errorAuto);
+error = errorHA(coordOptA, coordOptB, transformMat);
+errorBefore = errorHA(coordA, coordB, eye(3));
+disp(errorBefore);
+disp(error);
 

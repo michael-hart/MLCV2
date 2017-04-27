@@ -2,17 +2,46 @@
 clear;
 close all;
 addpath('../res');
-addpath('../res/boat');
 
 %% Load manual
-load('manualBoat.mat');
+% A to B, B to C, C to A. 
 
-%% Load previous variables from q1_auto.m; loads imgA, imgB, coordA, coordB
-load('auto_out.mat');
+%% Load pictures
+imgA = imread(one);
+imgB = imread(two);
+imgC = imread(three);
+
+harrisA = harris(imgA, 2500);
+harrisB = harris(imgB, 2500);
+harrisC = harris(imgC, 2500);
+
+ %% Display picture with points
+showImg = true;
+
+if showImg
+    figure('position', [0 0 1280 800]);
+    imshow(imgA);
+    hold on;
+    scatter(harrisA(1, :), harrisA(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
+    hold off;
+    
+    figure('position', [0 0 1280 800]);
+    imshow(imgB);
+    hold on;
+    scatter(harrisB(1, :), harrisB(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
+    hold off;
+    
+    figure('position', [0 0 1280 800]);
+    imshow(imgC);
+    hold on;
+    scatter(harrisC(1, :), harrisC(2, :), 50, 'x', 'MarkerEdgeColor', 'blue');
+    hold off;
+end
+
 
 %% Estimate transformation matrices
 transformMatAuto = estTransformMat(coordA, coordB);
-transformMatManual = estTransformMat(manA1, manB1);
+transformMatManual = estTransformMat(manualA, manualB);
 
 %% Warp Images!
 % Transpose required, MATLAB convention

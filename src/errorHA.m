@@ -19,7 +19,7 @@ function [ average_distance ] = errorHA( points1, points2, transformation )
     new_points1 = zeros(size(points1));
     for index = 1:n
         temp = transformation * [points1(:, index); 1];
-        new_points1(:, index) = temp(1:2);
+        new_points1(:, index) = temp(1:2)/temp(3);
     end
     
     % Euclidean distance between each pair of points.

@@ -1,16 +1,16 @@
 disp('matchy Start.');
-for outside = 1:5
+for outside = 1:1
     % Acquire image A. Perform Harris. Obtain features.
     imgA = imread(strcat('img', num2str(outside), '.pgm'));
-    harrisA = harris(imgA, 2500);
+    harrisA = harris(imgA, 4000);
     describeA = describe2(imgA, harrisA);
 
-    for inside = outside+1:6
+    for inside = outside+1:2
         % Acquire image B. Perform Harris. Obtain features.
         disp(['Outside value: ', num2str(outside), ' Inside value: ', num2str(inside)]);
         
-        imgB = imread(strcat('img', num2str(outside), '.pgm'));
-        harrisB = harris(imgB, 2500);
+        imgB = imread(strcat('img', num2str(inside), '.pgm'));
+        harrisB = harris(imgB, 4000);
         describeB = describe2(imgB, harrisB);
         
         disp('Matching.');

@@ -107,7 +107,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 
 \section{Question 1 - Matching}
 \subsection{Manual}
-Mike: Quick discussion? Or just point them to the code in the appendix.
+% Mike: Quick discussion? Or just point them to the code in the appendix.
+
+Although automatic interest point selection is preferable for computer vision, a valuable tool for checking how the algorithms work is to allow a user to manually select interest points. Five pairs of points are selected by the user, which are then assumed to match, removing the need for automatic point selection and patch matching. The MATLAB code to do this is found in the Appendix as file \texttt{q1\_manual.m}.
+
 
 \subsection{Automatic}
 \begin{enumerate}
@@ -125,6 +128,15 @@ Mike: Quick discussion? Or just point them to the code in the appendix.
     \item Needs to be done lol. ``Implement a method for calculating epipolar line given point coordinates and a
 Fundamental matrix between two images. Display that line on an image in Matlab.''
 \end{enumerate}
+
+
+\section{Image Geometry}
+
+\subsection{Homography}
+
+
+
+\subsection{Stereo Vision}
 
 \cite{notes}
 
@@ -147,8 +159,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 \onecolumn
 \section*{Appendix}
 
-% \subsection*{RF Quantisation Code}
-% \lstinputlisting[style=Matlab-editor]{src/rf_histogram.m}
-% \newpage
+\subsection*{q1\_manual.m}
+\lstinputlisting[style=Matlab-editor]{src/q1_manual.m}
+\newpage
 
 \end{document}

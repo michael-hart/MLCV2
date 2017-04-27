@@ -12,7 +12,7 @@ matchesAToB = zeros(1, N);
 matchesBToA = zeros(1, M);
 
 % Iterate over patches in A and match with B
-for n=1:N
+parfor n=1:N
     % Get description for iteration
     descA = describedA(:, n);
     dist = zeros(1, M);
@@ -27,7 +27,7 @@ for n=1:N
 end
 
 % Iterate over patches in B and match with A
-for m=1:M
+parfor m=1:M
     % Get description for iteration
     descB = describedB(:, m);
     dist = zeros(1, N);

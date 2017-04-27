@@ -1,6 +1,6 @@
 % Read and show two example images
-imgA = imread('img1.pgm');
-imgB = imread('img2.pgm');
+imgA = imread('HG1.pgm');
+imgB = imread('HG2.pgm');
 
 % Define colour cellstrs for colour pairing
 colours = cellstr(['red    '; 'blue   '; 'green  '; 'yellow '; 'magenta']);

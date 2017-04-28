@@ -70,9 +70,9 @@ function [] = test(hA, hB, hC, bins)
         'coordCA_A', 'coordCA_B');
 
     %% Ransac
-    [coordAB_AOpt, coordAB_BOpt] = myRANSAC(coordAB_A, coordAB_B, 1e6, 20);
-    [coordBC_AOpt, coordBC_BOpt] = myRANSAC(coordBC_A, coordBC_B, 1e6, 20);
-    [coordCA_AOpt, coordCA_BOpt] = myRANSAC(coordCA_A, coordCA_B, 1e6, 20);
+    [coordAB_AOpt, coordAB_BOpt] = myRANSAC(coordAB_A, coordAB_B, 1e5, 20);
+    [coordBC_AOpt, coordBC_BOpt] = myRANSAC(coordBC_A, coordBC_B, 1e5, 20);
+    [coordCA_AOpt, coordCA_BOpt] = myRANSAC(coordCA_A, coordCA_B, 1e5, 20);
 
     %% Save!
     save([outputpath, num2str(hA), num2str(hB), num2str(hC), num2str(bins), 'ransaccoord'], ...

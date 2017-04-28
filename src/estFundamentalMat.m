@@ -15,7 +15,7 @@ function [ fundamentalMat ] = estFundamentalMat( coordA, coordB )
         yb = coordB(2, i);
 
         n = n + 1;
-        A(n, :) = [xa * xb, ya * b, xb, ...
+        A(n, :) = [xa * xb, xb * ya, xb, ...
                    xa * yb, ya * yb, yb, ...
                    xa, ya, 1];
     end
@@ -31,4 +31,3 @@ function [ fundamentalMat ] = estFundamentalMat( coordA, coordB )
     fundamentalMat = reshape(f, 3, 3)';
 
 end
-

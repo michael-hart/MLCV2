@@ -137,16 +137,38 @@ Although automatic feature selection is preferable for computer vision, a valuab
 % Discuss need for interest point selection
 For many computer vision applications, detecting features within an image or the same features within multiple images is crucial. These features can take a number of shapes, such as edges or corners. Once the same detector is run on two images with some of the same features, such as overlapping features in a panorama, the features can be automatically matches and a transformation estimated between the images.
 
-% Discuss implemented selectors
-Both Hessian and Harris selectors have been implemented for this application. Both differentiate the given image twice and compare the results to a threshold, where calculations with the results vary depending on the detector. From subjective use of each detector, the Harris algorithm was found to perform more effectively. Both algorithms are based on code written by Svetlana Lazebnik \cite{harrisdetector}, and may be found in the Appendix as files \texttt{hessian.m} and \texttt{harris.m}. Images showing interest points detected by the two detectors are shown in Figure TODO.
+% Discuss implemented selectors - TODO discuss the example images?
+Both Hessian and Harris selectors have been implemented for this application. Both differentiate the given image twice and compare the results to a threshold, where calculations with the results vary depending on the detector. From subjective use of each detector, the Harris algorithm was found to perform more effectively. Both algorithms are based on code written by Svetlana Lazebnik \cite{harrisdetector}, and may be found in the Appendix as files \texttt{hessian.m} and \texttt{harris.m}. Images showing interest points detected by the two detectors are shown in Figure \ref{fig:detectors}. These images show an unexpected result in that many of the detected features seem to be part of uniform patches of image; this may suggest an insufficiently large threshold.
 
-% Discuss need for description 
-% Discuss implemented description methods
-% Discuss patch matching implementation
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/hessian1e8}
+      \caption{Image with Hessian detector, threshold $10^8$}
+      \label{fig:hessian1e8}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/harris3000}
+      \caption{Image with Harris detector, threshold 3000}
+      \label{fig:harris3000}
+    \end{subfigure}
+
+	\caption{Examples of Harris and Hessian detectors operating on Kitchen image}
+  \label{fig:detectors}
+\end{figure}
+
+% Discuss need for description & our implementation
+Once features have been detected in the image, these points must have some description to allow comparison with other points. At first, each interest point was used at the top left corner of a fixed-size patch, limiting the point so as not to cross the border. However, this removed some information due to the border limiting and the patch position missing out on rotation information if matching between images; therefore, the interest point is the centre of a patch in a padded image, and the descriptor of that patch is a simple histogram. The padded image is found by replicating the border pixels outwards. This may be found in the Appendix as \texttt{describe.m}.
+
+% Discuss patch matching implementation - could really do with a side-by-side with lines connecting matched patches
+Once each interest point has a corresponding descriptor, the points from two different images can be compared. The simplest method for comparing these descriptors is to use nearest neighbour (NN) matching, which interprets the difference in histograms as an error, and matches the points with the least error. Furthermore, the interest points from each image are considered in turn, and only if a pair of patches are both nearest neighbours to each other are they considered to match. The algorithm for this is shown in  the Appendix as \texttt{matchPatches.m}. An example image of two images with matching points is shown in Figure TODO.
+
 
 \begin{enumerate}
     \item Harris Detector Method. PIC: img1 with points on it, show with different thresholds.
-    \item Patch Extraction and Features Method. PIC: Example patches extracted, resulting histograms example.
+    \item Patch Extraction and Features Method. PIC: Example patches extracted, resulting histograms example. Do we definitely have to visualise this? Seems like it would take loads of space
     \item NN Matching Method PIC: Using img1 and img2 with
     \texttt{showMatchedFeatures(imgA, imgB, matchedPoints1, matchedPoints2);} to show result.
 \end{enumerate}
@@ -203,5 +225,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 \subsection*{harris.m}
 \lstinputlisting[style=Matlab-editor]{src/harris.m}
 \newpage
+
+\subsection*{describe.m}
+\lstinputlisting[style=Matlab-editor]{src/describe2.m}
+\newpage
+
 
 \end{document}

@@ -6,7 +6,7 @@ function [] = test(hA, hB, hC, bins)
     else
         addpath('res/kitchen')
         addpath('res');
-        outpath = ('res/');
+        outputpath = ('res/');
     end
 
     imgA = imread('HG1.pgm');

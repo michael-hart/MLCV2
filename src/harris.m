@@ -3,7 +3,7 @@ function [ points ] = harris( img, thresh )
 %   Smoothing matrix is hard coded
 %   2xN matrix is x,y co-ordinates of interest points, denoted points
 %   img is the input image
-%   thresh is the threshold; consider around 1e7
+%   thresh is the threshold; consider around 2500
 
     % With thanks to
     % http://web.engr.illinois.edu/~slazebni/spring16/harris.m

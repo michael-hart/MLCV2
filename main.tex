@@ -107,10 +107,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 % What are the methods discussed? Short explanations
 
 \section{Question 1 - Matching}
-\subsection{Manual}
-% Mike: Quick discussion? Or just point them to the code in the appendix.
 
-Although automatic interest point selection is preferable for computer vision, a valuable tool for checking how the algorithms work is to allow a user to manually select interest points. Five pairs of points are selected by the user, which are then assumed to match, removing the need for automatic point selection and patch matching. The MATLAB code to do this is found in the Appendix as file \texttt{q1\_manual.m}. An example of two images with the selected data points is shown in Figure \ref{fig:manual}.
+\subsection{Manual Feature Selection}
+
+% Maybe a bit overkill considering our page limit, butt fuck it
+Although automatic feature selection is preferable for computer vision, a valuable tool for checking how the algorithms work is to allow a user to manually select interest points. Five pairs of points are selected by the user, which are then assumed to match, removing the need for automatic point selection and patch matching. The MATLAB code to do this is found in the Appendix as file \texttt{q1\_manual.m}. An example of two images with the selected data points is shown in Figure \ref{fig:manual}.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -131,7 +132,18 @@ Although automatic interest point selection is preferable for computer vision, a
   \label{fig:manual}
 \end{figure}
 
-\subsection{Automatic}
+\subsection{Automatic Feature Detection}
+
+% Discuss need for interest point selection
+For many computer vision applications, detecting features within an image or the same features within multiple images is crucial. These features can take a number of shapes, such as edges or corners. Once the same detector is run on two images with some of the same features, such as overlapping features in a panorama, the features can be automatically matches and a transformation estimated between the images.
+
+% Discuss implemented selectors
+Both Hessian and Harris selectors have been implemented for this application. Both differentiate the given image twice and compare the results to a threshold, where calculations with the results vary depending on the detector. From subjective use of each detector, the Harris algorithm was found to perform more effectively. Both algorithms are based on code written by Svetlana Lazebnik \cite{harrisdetector}, and may be found in the Appendix as files \texttt{hessian.m} and \texttt{harris.m}. Images showing interest points detected by the two detectors are shown in Figure TODO.
+
+% Discuss need for description 
+% Discuss implemented description methods
+% Discuss patch matching implementation
+
 \begin{enumerate}
     \item Harris Detector Method. PIC: img1 with points on it, show with different thresholds.
     \item Patch Extraction and Features Method. PIC: Example patches extracted, resulting histograms example.
@@ -182,6 +194,14 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 
 \subsection*{q1\_manual.m}
 \lstinputlisting[style=Matlab-editor]{src/q1_manual.m}
+\newpage
+
+\subsection*{hessian.m}
+\lstinputlisting[style=Matlab-editor]{src/hessian.m}
+\newpage
+
+\subsection*{harris.m}
+\lstinputlisting[style=Matlab-editor]{src/harris.m}
 \newpage
 
 \end{document}

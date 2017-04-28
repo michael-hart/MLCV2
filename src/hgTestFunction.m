@@ -1,4 +1,6 @@
 function [] = test(hA, hB, hC, bins)
+
+    start = tic();
     if ismac
         addpath('../res/kitchen');
         addpath('../res');
@@ -16,19 +18,28 @@ function [] = test(hA, hB, hC, bins)
     showImg = true;
 
     %% Harris pictures
+    disp('Harris detection.');
     harrisA = harris(imgA, hA);
     harrisB = harris(imgB, hB);
     harrisC = harris(imgC, hC);
+    disp(['Harris took ' num2str(toc(start)) 's.']);
+    start = tic();
 
     %% Extract, quantise
+    disp('Point description.');
     describeA = describe3(imgA, harrisA, bins);
     describeB = describe3(imgB, harrisB, bins);
     describeC = describe3(imgC, harrisC, bins);
+    disp(['Description took ' num2str(toc(start)) 's.']);
+    start = tic();
 
     %% Match
+    disp('Patch matching.');
     matchesAB = matchPatches(describeA, describeB);
     matchesBC = matchPatches(describeB, describeC);
     matchesCA = matchPatches(describeC, describeA);
+    disp(['Matching took ' num2str(toc(start)) 's.']);
+    start = tic();
 
     nMatchAB = size(matchesAB, 2);
     coordAB_A = zeros(2, nMatchAB);
@@ -64,17 +75,22 @@ function [] = test(hA, hB, hC, bins)
     end
 
     %% Save!
+    disp('Save matched co-ordinates.');
     save([outputpath, num2str(hA), num2str(hB), num2str(hC), num2str(bins), 'coord'], ...
         'coordAB_A', 'coordAB_B', ...
         'coordBC_A', 'coordBC_B', ...
         'coordCA_A', 'coordCA_B');
 
     %% Ransac
+    disp('Filter using RANSAC.');
     [coordAB_AOpt, coordAB_BOpt] = myRANSAC(coordAB_A, coordAB_B, 1e5, 20);
     [coordBC_AOpt, coordBC_BOpt] = myRANSAC(coordBC_A, coordBC_B, 1e5, 20);
     [coordCA_AOpt, coordCA_BOpt] = myRANSAC(coordCA_A, coordCA_B, 1e5, 20);
+    disp(['RANSAC took ' num2str(toc(start)) 's.']);
+    start = tic();
 
     %% Save!
+    disp('Save filtered co-ordinates.');
     save([outputpath, num2str(hA), num2str(hB), num2str(hC), num2str(bins), 'ransaccoord'], ...
         'coordAB_AOpt', 'coordAB_BOpt', ...
         'coordBC_AOpt', 'coordBC_BOpt', ...
@@ -108,9 +124,12 @@ function [] = test(hA, hB, hC, bins)
     end
 
     %% Estimate transformation matrices
+    disp('Estimate transformation matrices.');
     transformMatAB = estTransformMat(coordAB_AOpt, coordAB_BOpt);
     transformMatBC = estTransformMat(coordBC_AOpt, coordBC_BOpt);
     transformMatCA = estTransformMat(coordCA_AOpt, coordCA_BOpt);
+    disp(['Transformation estimation took ' num2str(toc(start)) 's.']);
+    start = tic();
     save([outputpath, num2str(hA), num2str(hB), num2str(hC), num2str(bins), 'trans'], 'transformMatAB', 'transformMatBC', 'transformMatCA');
 
     %% Warp Images!
@@ -126,7 +145,7 @@ function [] = test(hA, hB, hC, bins)
     [imgCA, refCA] = imwarp(imgC, transformMatCAObj);
 
     % Save pictures
-
+    disp('Save pictures.');
     figure;
     imshowpair(imgB, imref2d(size(imgB)), imgAB, refAB);
     fig = gcf;

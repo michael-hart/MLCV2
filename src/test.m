@@ -1,12 +1,18 @@
 function [] = test(hA, hB, hC, bins)
-    addpath('../res/kitchen');
-    addpath('../res');
-    outputpath = ('../');
+    if ismac
+        addpath('../res/kitchen');
+        addpath('../res');
+        outputpath = ('../');
+    else
+        addpath('res/kitchen')
+        addpath('res');
+        outpath = ('');
+    end
 
     imgA = imread('HG1.pgm');
     imgB = imread('HG2.pgm');
     imgC = imread('HG3.pgm');
-    
+
     showImg = true;
 
     %% Harris pictures

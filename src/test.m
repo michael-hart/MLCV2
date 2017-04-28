@@ -2,11 +2,11 @@ function [] = test(hA, hB, hC, bins)
     if ismac
         addpath('../res/kitchen');
         addpath('../res');
-        outputpath = ('../');
+        outputpath = ('../res/');
     else
         addpath('res/kitchen')
         addpath('res');
-        outpath = ('');
+        outpath = ('res/');
     end
 
     imgA = imread('HG1.pgm');

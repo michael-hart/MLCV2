@@ -1,4 +1,4 @@
-function [] = test(hA, hB, hC, bins)
+function [] = hgTestFunction(hA, hB, hC, bins)
 
     start = tic();
     if ismac

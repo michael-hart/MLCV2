@@ -1,4 +1,4 @@
-function [] = test3(hA, hB, hC, bins)
+function [] = fdPointsGenFunction(hA, hB, hC, bins)
     if ismac
         addpath('../res/kitchen');
         addpath('../res');

@@ -19,6 +19,7 @@
 % IEEEConf includes settings for caption/subcaption already!
 % \usepackage[font=footnotesize,labelfont=bf]{caption}
 \usepackage[font=footnotesize,labelfont=bf]{subcaption}
+\usepackage{gensymb}
 
 %% Packages for displaying source code
 \usepackage{listings}
@@ -109,8 +110,26 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 \subsection{Manual}
 % Mike: Quick discussion? Or just point them to the code in the appendix.
 
-Although automatic interest point selection is preferable for computer vision, a valuable tool for checking how the algorithms work is to allow a user to manually select interest points. Five pairs of points are selected by the user, which are then assumed to match, removing the need for automatic point selection and patch matching. The MATLAB code to do this is found in the Appendix as file \texttt{q1\_manual.m}.
+Although automatic interest point selection is preferable for computer vision, a valuable tool for checking how the algorithms work is to allow a user to manually select interest points. Five pairs of points are selected by the user, which are then assumed to match, removing the need for automatic point selection and patch matching. The MATLAB code to do this is found in the Appendix as file \texttt{q1\_manual.m}. An example of two images with the selected data points is shown in Figure \ref{fig:manual}.
 
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/manualA}
+      \caption{Image A, original image}
+      \label{fig:manualA}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/manualB}
+      \caption{Image B, zoomed by factor 1.5 and tilted by 20\degree}
+      \label{fig:manualB}
+    \end{subfigure}
+
+	\caption{Example of manually selected data points on images}
+  \label{fig:manual}
+\end{figure}
 
 \subsection{Automatic}
 \begin{enumerate}

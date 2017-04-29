@@ -163,17 +163,41 @@ Both Hessian and Harris selectors have been implemented for this application. Bo
 Once features have been detected in the image, these points must have some description to allow comparison with other points. At first, each interest point was used at the top left corner of a fixed-size patch, limiting the point so as not to cross the border. However, this removed some information due to the border limiting and the patch position missing out on rotation information if matching between images; therefore, the interest point is the centre of a patch in a padded image, and the descriptor of that patch is a simple histogram. The padded image is found by replicating the border pixels outwards. This may be found in the Appendix as \texttt{describe.m}.
 
 % Discuss patch matching implementation - could really do with a side-by-side with lines connecting matched patches
-Once each interest point has a corresponding descriptor, the points from two different images can be compared. The simplest method for comparing these descriptors is to use nearest neighbour (NN) matching, which interprets the difference in histograms as an error, and matches the points with the least error. Furthermore, the interest points from each image are considered in turn, and only if a pair of patches are both nearest neighbours to each other are they considered to match. The algorithm for this is shown in  the Appendix as \texttt{matchPatches.m}. An example image of two images with matching points is shown in Figure TODO.
+Once each interest point has a corresponding descriptor, the points from two different images can be compared. The simplest method for comparing these descriptors is to use nearest neighbour (NN) matching, which interprets the difference in histograms as an error, and matches the points with the least error. Furthermore, the interest points from each image are considered in turn, and only if a pair of patches are both nearest neighbours to each other are they considered to match. The algorithm for this is shown in  the Appendix as \texttt{matchPatches.m}. 
+
+An example image of two images with matching points is shown in Figure \ref{fig:matched}. The images used are the same as in Figure \ref{fig:manual}, but the threshold of 3000 with the Harris detector were used, which would indicate a similar number of feature points as in Figure \ref{fig:harris3000}. After NN matching, the number of points has been vastly reduced and mostly correspond, with a couple of exceptions, such as the green line between the coffee pot and the coffee machine pod. These points are not the same, but the surrounding area is very similar, which causes the error.
+
+% I did also create this figure with showMatchedFeatures, but I found it really hard to spot where the differences are, so I did it like this. I can upload the matchedFeatures version if you want, just ask
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{pic/matches}
+  \caption{Matched patches between original image and image zoomed by factor 1.5 and tilted by 20\degree}
+  \label{fig:matched}
+\end{figure}
 
 
-\begin{enumerate}
-    \item Harris Detector Method. PIC: img1 with points on it, show with different thresholds.
-    \item Patch Extraction and Features Method. PIC: Example patches extracted, resulting histograms example. Do we definitely have to visualise this? Seems like it would take loads of space
-    \item NN Matching Method PIC: Using img1 and img2 with
-    \texttt{showMatchedFeatures(imgA, imgB, matchedPoints1, matchedPoints2);} to show result.
-\end{enumerate}
+% \begin{enumerate}
+%     \item Harris Detector Method. PIC: img1 with points on it, show with different thresholds.
+%     \item Patch Extraction and Features Method. PIC: Example patches extracted, resulting histograms example. Do we definitely have to visualise this? Seems like it would take loads of space
+%     \item NN Matching Method PIC: Using img1 and img2 with
+%     \texttt{showMatchedFeatures(imgA, imgB, matchedPoints1, matchedPoints2);} to show result.
+% \end{enumerate}
 
 \subsection{Transformation Estimation}
+
+% Need to discuss homography matrix estimation and show example
+% Need to discuss fundamental matrix estimation (and show example?)
+% Discuss errorHA method
+% Discuss epipole lines and show example
+
+The matching pairs of points can be used to estimate the transformation matrix between the two images, known as the homography matrix. The homography matrix is \textbf{H}, and must satisfy Equation \ref{eqn:homography}, where \textbf{x} is the original point and $\textbf{x}'$ is the destination point after the transformation. The method for this is discussed in the course notes \cite{notes}; as such, examples of transformations will be shown, with the full details of implementation given in the source code in the Appendix, file \texttt{estTransformMat.m}.
+
+\begin{equation} \label{eqn:homography}
+\textbf{x}' = \textbf{Hx}
+\end{equation}
+
+The 
+
 \begin{enumerate}
     \item Homography Matrix Estimation Method PIC: img1 with img2
     \item Fundamental Matrix Estimation Method
@@ -230,5 +254,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 \lstinputlisting[style=Matlab-editor]{src/describe2.m}
 \newpage
 
+\subsection*{estTransformMat.m}
+\lstinputlisting[style=Matlab-editor]{src/estTransformMat.m}
+\newpage
 
 \end{document}

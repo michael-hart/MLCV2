@@ -1,10 +1,5 @@
-%% Q2 Part 1 Section B
-clear;
-close all;
-addpath('../res');
-addpath('../res/boat');
+%% Q2 Part 1 Section C
 
-%% Question 2 Part 1 Section B - Editing Up
 clear;
 close all;
 
@@ -34,8 +29,23 @@ for number = 4:N
     coordBC_AOpt_Selected = coordBC_AOpt(:, indices);
     coordBC_BOpt_Selected = coordBC_BOpt(:, indices);
     transformMat = estTransformMat(coordBC_AOpt_Selected, coordBC_BOpt_Selected);
-    errors(number-3) = errorHA(coordBC_AOpt_Selected, coordBC_BOpt_Selected, transformMat);
+    errors(number) = errorHA(coordBC_AOpt_Selected, coordBC_BOpt_Selected, transformMat);
 end
 
-plot(4:N, errors);
+figure('position', [0 0 1280 800]);
+plot(1:N, errors, 'LineWidth', 5);
+axis([0 N 0 ceil(max(errors)/10) * 10]);
+
+title('HA Error vs. Number of Corresponding Points', 'interpreter', 'latex');
+xlabel('Number of Corresponding Points', 'interpreter', 'latex');
+ylabel('HA Error', 'interpreter', 'latex');
+grid;
+
+% Format data
+set(findall(gcf,'type','axes'),'fontsize',25);
+set(findall(gcf,'type','text'),'fontSize',25);
+% Save data
+fig = gcf;
+fig.PaperPositionMode = 'auto';
+print([outputpath, 'pic/q2_1_c'],'-dpng','-r0');
 

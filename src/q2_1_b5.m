@@ -14,11 +14,11 @@ else
     outputpath = (''); % Wherever you want them
 end
 
-for outside = 1:1
+for outside = 3:3
     % Acquire image A. 
     imgA = imread(strcat('img', num2str(outside), '.pgm'));
 
-    for inside = outside+1:2
+    for inside = outside+1:4
         % Acquire image B.
         
         imgB = imread(strcat('img', num2str(inside), '.pgm'));
@@ -27,14 +27,14 @@ for outside = 1:1
         
         load(loadfilename);
         
-        savepicname = strcat('pic/q2_1_b4_', num2str(outside), '_', num2str(inside),'.mat');
+        savepicname = strcat('pic/q2_1_b4_', num2str(outside), '_', num2str(inside));
         
         % For my info
         disp(['Outside value: ', num2str(outside), ...
             ' Inside value: ', num2str(inside)]);
 
         % Visualise matches.
-        figure;
+        figure('Visible','off')
         p1 = cornerPoints(coordOptA');
         p2 = cornerPoints(coordOptB');
         showMatchedFeatures(imgA, imgB, p1, p2);
@@ -45,17 +45,17 @@ for outside = 1:1
         % Transform and project
         transformMat = estTransformMat(coordOptA, coordOptB);
         [imgAB, refAB] = projection(imgA, transformMat);
-%         transformMatABObj = projective2d(transformMat');
+%         transformMatABObj = projective2d(transformMat2');
 %         [imgAB, refAB] = imwarp(imgA, transformMatABObj);
         
         % Visualise new image and overlay
-        figure;
+        figure('Visible','off')
         imshow(imgAB);
         fig = gcf;
         fig.PaperPositionMode = 'auto';
 %         print([outputpath, savepicname, '_transformed'],'-dpng','-r0');
     
-        figure;
+        figure('Visible','on', 'position', [0 0 1280 800])
         imshowpair(imgB, imref2d(size(imgB)), imgAB, refAB);
         fig = gcf;
         fig.PaperPositionMode = 'auto';

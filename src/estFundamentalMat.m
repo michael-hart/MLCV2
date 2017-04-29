@@ -1,8 +1,8 @@
 function [ fundamentalMat ] = estFundamentalMat( coordA, coordB )
-%ESTFUNDAMENTALMAT Estimates transformation matrix from A to B
+%ESTFUNDAMENTALMAT Estimates fundamental matrix from A to B
 %   Uses matched co-ordinate pairs in coordA, coordB
 %   coordA and coordB are 2xN matrices, N the same for both
-%   Returns transformMat, a 3x3 transformation matrix
+%   Returns fundamentalMat, a 3x3 transformation matrix
 
     A = zeros(size(coordA, 2), 9);
 

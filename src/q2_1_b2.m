@@ -180,17 +180,9 @@ transformMatCA = estTransformMat(coordCA_AOpt, coordCA_BOpt);
 save([outputpath, 'res/q2_1_b2_transRANSAC'], 'transformMatAB', 'transformMatBC', 'transformMatCA');
 
 %% Warp Images!
-% [imgAB, refAB] = projection(imgA, transformMatAB);
-% [imgBC, refBC] = projection(imgB, transformMatBC);
-% [imgCA, refCA] = projection(imgC, transformMatCA);
-transformMatABObj = projective2d(transformMatAB');
-transformMatBCObj = projective2d(transformMatBC');
-transformMatCAObj = projective2d(transformMatCA');
-
-[imgAB, refAB] = imwarp(imgA, transformMatABObj);
-[imgBC, refBC] = imwarp(imgB, transformMatBCObj);
-[imgCA, refCA] = imwarp(imgC, transformMatCAObj);
-
+[imgAB, refAB] = projection(imgA, transformMatAB);
+[imgBC, refBC] = projection(imgB, transformMatBC);
+[imgCA, refCA] = projection(imgC, transformMatCA);
 
 % Save pictures
 if showImg

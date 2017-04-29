@@ -18,10 +18,10 @@ if newPoints
 else
     load('q2_2_a.mat');
 end
-%%
+
 imgA = imread('FD1.pgm');
 imgB = imread('FD2.pgm');
-
+%%
 figure;
 p1 = cornerPoints(coordAB_A');
 p2 = cornerPoints(coordAB_B');

@@ -186,9 +186,6 @@ An example image of two images with matching points is shown in Figure \ref{fig:
 \subsection{Transformation Estimation}
 
 % Need to discuss homography matrix estimation and show example
-% Need to discuss fundamental matrix estimation (and show example?)
-% Discuss errorHA method
-% Discuss epipole lines and show example
 
 The matching pairs of points can be used to estimate the transformation matrix between the two images, known as the homography matrix. The homography matrix is \textbf{H}, and must satisfy Equation \ref{eqn:homography}, where \textbf{x} is the original point and $\textbf{x}'$ is the destination point after the transformation. The method for this is discussed in the course notes \cite{notes}; as such, examples of transformations will be shown, with the full details of implementation given in the source code in the Appendix, file \texttt{estTransformMat.m}.
 
@@ -196,22 +193,55 @@ The matching pairs of points can be used to estimate the transformation matrix b
 \textbf{x}' = \textbf{Hx}
 \end{equation}
 
-An example of an estimated homography matrix is given in Equation TODO, where the images used in Figure \ref{fig:manual} were again used to estimate a transformation. The result of transforming Image A to fit Image B
+An example of an estimated homography matrix is given in Equation \ref{eqn:homographyEstimated}, where the images used in Figure \ref{fig:manual} were again used to estimate a transformation. The result of transforming Image A to fit Image B is shown in Figure \ref{fig:homography}, which used manually selected user points as corresponding co-ordinates and estimated an accurate homography matrix. The matrix is considered accurate as the two images overlap to form grayscale in the centre. There is a slight error, shown by blurring around sharp edges where the green and purple do not match correctly.
+
+\begin{equation} \label{eqn:homographyEstimated}
+\textbf{H} = \begin{bmatrix}
+    1.3964 & 0.5742 & -455.55 \\
+    -0.5984 & 1.3651 & 190.96 \\
+    0.0000 & -0.0000 & 1.0000
+\end{bmatrix}
+\end{equation}
 
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=\linewidth]{pic/homographyExample}
-  \caption{}
+  \caption{Image A (purple) transformed and overlaid on Image B (green)}
   \label{fig:homography}
 \end{figure}
 
-\begin{enumerate}
-    \item Homography Matrix Estimation Method PIC: img1 with img2
-    \item Fundamental Matrix Estimation Method
-    \item ErrorHA Method (also does projecting)
-    \item Needs to be done lol. ``Implement a method for calculating epipolar line given point coordinates and a
-Fundamental matrix between two images. Display that line on an image in Matlab.''
-\end{enumerate}
+% Discuss errorHA method
+To estimate how well a homography matrix matches the two sets of points together, a metric called the Homography Accuracy (HA) is used. This HA is calculated by taking the corresponding sets of points and transforming one set to fit the other using the given homography matrix. The error between the predicted and actual points is interpreted as the distance; the mean distance is the HA. The HA for the example shown in \ref{fig:homography} is $HA=0.0536$.
+
+% Need to discuss fundamental matrix estimation (and show example?)
+Another matrix used in computer vision is the fundamental matrix, which can be estimated using a series of corresponding points. This matrix can be used to constrain the possible locations of points in a second image from points in the first image given the fundamental matrix between the two images. The method itself is very similar to the homography matrix, except that the relation in Equation \ref{eqn:fundamental} is used instead of that in Equation \ref{eqn:homography}. The code for implementation is given in the Appendix as file \texttt{estFundamentalMat.m}.
+
+\begin{equation} \label{eqn:fundamental}
+\textbf{x}'^T\textbf{Fx} = 0
+\end{equation}
+
+% Discuss epipole lines and show example
+% TODO actually sort out epipole lines
+
+The fundamental matrix can be used to constrain the search space from points in one image to the same scene points in the second image by giving the equation of a line $\textbf{l}=\textbf{Fx}$, such that the correct point on the line \textbf{l} satisfies Equation \ref{eqn:fundamental}. This is known as the epipole line. The same manual data and images used for Figure \ref{fig:homography} are used to estimate a fundamental matrix, given in Equation \ref{eqn:fundamentalEstimated}. This matrix \textbf{F} is then used to generate epipolar lines, shown in Figure TODO.
+
+\begin{equation} \label{eqn:fundamentalEstimated}
+\textbf{F} = \begin{bmatrix}
+     0.0000 & -0.0001 &  0.0017 \\
+     0.0001 &  0.0000 & -0.0355 \\
+    -0.0191 &  0.0280 &  1.0000
+\end{bmatrix}
+\end{equation}
+
+% TODO show epipole lines image
+
+% \begin{enumerate}
+%     \item Homography Matrix Estimation Method PIC: img1 with img2
+%     \item Fundamental Matrix Estimation Method
+%     \item ErrorHA Method (also does projecting)
+%     \item Needs to be done lol. ``Implement a method for calculating epipolar line given point coordinates and a
+% Fundamental matrix between two images. Display that line on an image in Matlab.''
+% \end{enumerate}
 
 \section{Question - Image Geometry}
 \subsection{Homography with HG Pictures}

@@ -13,7 +13,7 @@ else
 end
 
 %% Attempt to match?
-newPoints = true;
+newPoints = false;
 
 if newPoints
     [coordA, coordB] = q1_manual('tkb1.pgm', 'tkb5.pgm');
@@ -30,7 +30,7 @@ imgB = imread('tkb5.pgm');
 
 %% Calculate F, epipoles, lines, 
 F = estFundamentalMat(coordA, coordB);
-[epiLines, epiPole] = epiPolesLines(coordA, F, [NaN NaN]);
+[epiLines, ~, epiPole] = epiPolesLines(coordA, F, [NaN NaN]);
 disp(epiPole);
 
 %% Calculate lines.
@@ -58,7 +58,7 @@ print([outputpath, 'pic/q1_3_d_A'],'-dpng','-r0');
 
 %% Repeat on B
 % Transpose F to fix. 
-[epiLines, epiPole] = epiPolesLines(coordB, F', [NaN NaN]);
+[epiLines, ~, epiPole] = epiPolesLines(coordB, F', [NaN NaN]);
 disp(epiPole);
 
 imgWidth = size(imgB, 2);

@@ -21,52 +21,31 @@ end
 
 imgA = imread('FD1.pgm');
 imgB = imread('FD2.pgm');
-%%
+%% Display matching.
 figure;
 p1 = cornerPoints(coordAB_A');
 p2 = cornerPoints(coordAB_B');
 showMatchedFeatures(imgA, imgB, p1, p2);
-%% Acquire fundamental matrix. Acquire epipole. 
+%% Acquire fundamental matrix. Acquire epipole and lines.
 
-F1 = estFundamentalMat(coordAB_A, coordAB_B);
-[~, ~, V1] = svd(F1);
-eA1 = V1(:, end);
+F = estFundamentalMat(coordAB_A, coordAB_B);
+[epiLines, epiPole] = epiPolesLines(coordAB_A, F, [NaN NaN]);
 
+%% Plot lines. 
+imgWidth = size(imgA, 2);
+N = size(epiLines, 1);
 
-offset = size(imgA)/2+.5;
-offset = fliplr(offset);
+xpoints = repmat(1:imgWidth, N, 1)';
 
-N = size(coordAB_A, 2);
-
-coordAB_AFixed = coordAB_A - offset(ones(N, 1), :)';
-coordAB_BFixed = coordAB_B - offset(ones(N, 1), :)';
-
-F2 = estFundamentalMat(coordAB_AFixed, coordAB_BFixed);
-
-[~, ~, V2] = svd(F2);
-eA2 = V2(:, end);
-
-%% Calulate epipolar lines for each point. Plot line. 
-figure;
-imshow([imgA, imgB]);
-hold on;
-scatter(coordAB_A(1, :), coordAB_A(2, :), 50, 'o', 'filled', 'blue');
-
-for index = 1:size(coordAB_A, 2)
-    x1 = coordAB_AFixed(1, index);
-    y1 = coordAB_AFixed(2, index);
-    
-    x2 = eA2(1);
-    y2 = eA2(2);
-    
-    m = (y2 - y1)/(x2 - x1);
-    b = y2 - m * x2;
-    
-    M = size(imgA, 2);
-    xplot = 1:M;
-    yplot = m * xplot + b;
-    points = round([xplot; yplot] + offset(ones(M, 1), :)');
-    plot(points');
+ypoints = zeros(imgWidth, N);
+for index = 1:N
+    ypoints(:, index) = [1:imgWidth]' .* epiLines(index, 1) + epiLines(index, 2);
 end
+
+figure;
+imshow([imgA]);
+hold on;
+plot(xpoints, ypoints);
+scatter(coordAB_A(1, :), coordAB_A(2, :), 50, 'o', 'filled', 'blue');
 hold off;
 

@@ -18,8 +18,9 @@ imgA = imread('HG1.pgm');
 imgB = imread('HG2.pgm');
 imgC = imread('HG3.pgm');
 
+load('20020020064coord.mat');
 load('20020020064ransaccoord.mat');
-
+%% Processing
 N = size(coordBC_AOpt,2);
 
 errors = zeros(1, N-3);

@@ -221,35 +221,67 @@ Another matrix used in computer vision is the fundamental matrix, which can be e
 \end{equation}
 
 % Discuss epipole lines and show example
-% TODO actually sort out epipole lines
-
-The fundamental matrix can be used to constrain the search space from points in one image to the same scene points in the second image by giving the equation of a line $\textbf{l}=\textbf{Fx}$, such that the correct point on the line \textbf{l} satisfies Equation \ref{eqn:fundamental}. This is known as the epipole line. The same manual data and images used for Figure \ref{fig:homography} are used to estimate a fundamental matrix, given in Equation \ref{eqn:fundamentalEstimated}. This matrix \textbf{F} is then used to generate epipolar lines, shown in Figure TODO.
+The fundamental matrix can be used to constrain the search space from points in one image to the same scene points in the second image by giving the equation of a line $\textbf{l}=\textbf{Fx}$, such that the correct point on the line \textbf{l} satisfies Equation \ref{eqn:fundamental}. This is known as the epipolar line. To demonstrate example epipoles and epipolar lines, images from the Tsukuba image set \cite{tsukuba} have been used. The images have user-selected matching points which are used to estimate a fundamental matrix, given in Equation \ref{eqn:fundamentalEstimated}. This matrix \textbf{F} is then used to generate epipolar lines, shown in Figure \ref{fig:epipolar}. The function used to generate the epipolar lines is given in the Appendix as file \texttt{epiPolesLines.m}.
 
 \begin{equation} \label{eqn:fundamentalEstimated}
 \textbf{F} = \begin{bmatrix}
-     0.0000 & -0.0001 &  0.0017 \\
-     0.0001 &  0.0000 & -0.0355 \\
-    -0.0191 &  0.0280 &  1.0000
+     0.0001 &  0.0005 &  0.0494 \\
+    -0.0007 & -0.0000 & -0.6736 \\
+    -0.0849 &  0.7735 &  1.0000
 \end{bmatrix}
 \end{equation}
 
-% TODO show epipole lines image
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q1_3_d_A}
+      \caption{Tsukuba image A with epipoles and epipolar lines from B}
+      \label{fig:tsuka}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q1_3_d_B}
+      \caption{Tsukuba image B with epipoles and epipolar lines from A}
+      \label{fig:tsukb}
+    \end{subfigure}
 
-% \begin{enumerate}
-%     \item Homography Matrix Estimation Method PIC: img1 with img2
-%     \item Fundamental Matrix Estimation Method
-%     \item ErrorHA Method (also does projecting)
-%     \item Needs to be done lol. ``Implement a method for calculating epipolar line given point coordinates and a
-% Fundamental matrix between two images. Display that line on an image in Matlab.''
-% \end{enumerate}
+	\caption{Epipoles and estimated epipolar lines}
+  \label{fig:epipolar}
+\end{figure}
+
 
 \section{Question - Image Geometry}
+
+The kitchen images used thus far in this paper have been taken by the authors; as such, parameters of the images are known. The FD set has a 20cm displacement between each of the three images, with all other parameters the same, and a focal length of 24mm. The HG set is taken without displacing the camera; the first image is level with 24mm focal length; the second is tilted by 20\degree, taken with 36mm focal length; the third image is tilted by $40\degree$ with 56mm focal length.
+
 \subsection{Homography with HG Pictures}
+
 \subsubsection{Reduced Size}
-0.5995 Error
+The image HG1 was used for this test, with the Harris detector and a threshold of 500 used to detect interest points. The image was then scaled down to half its original size in both width and height, and the same Harris detector run on the result. The two sets of resulting points were matched as previously described. The average distance between the matched points, or HA error, was calculated as 0.5995. Therefore, although there are far more interest points detected with the larger resolution image, the points that are matched between the two images are very close to each other. The points can be seen in Figure \ref{fig:reducedcompare}.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{pic/q2_1_a_imgBoth}
+  \caption{Image HG1 with original size interest points in blue and interest points from reduced image in green.}
+  \label{fig:reducedcompare}
+\end{figure}
+
 \subsubsection{Manual vs. Automatic}
-Harris 4K points for 500 threshold
+% Harris 4K points for 500 threshold
+To determine the success of automatic point detection, user-selected and automatic point selection were both used to determine the homography matrices between HG1, HG2, and HG3. 
+
+% Need to show automatic vs. manual for a pair of pictures
+% Need to visualise those homographies
+% Need to analyse those homographies for translation/rotation/projection things
+
+
 \subsubsection{Number of Correspondences}
+
+% Need to go through a few different numbers of correspondences and see how the homography changes
+% Find the number of outliers
+% Explain how you found the outliers
+
 
 \subsection{Stereo Vision With FD Pictures}
 
@@ -294,5 +326,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 \subsection*{estTransformMat.m}
 \lstinputlisting[style=Matlab-editor]{src/estTransformMat.m}
 \newpage
+
+\subsection*{epiPolesLines.m}
+\lstinputlisting[style=Matlab-editor]{src/epiPolesLines.m}
+\newpage
+
 
 \end{document}

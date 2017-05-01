@@ -269,11 +269,56 @@ The image HG1 was used for this test, with the Harris detector and a threshold o
 
 \subsubsection{Manual vs. Automatic}
 % Harris 4K points for 500 threshold
-To determine the success of automatic point detection, user-selected and automatic point selection were both used to determine the homography matrices between HG1, HG2, and HG3. 
+To determine the success of automatic point detection, user-selected and automatic point selection were both used to determine the homography matrices between HG1, HG2, and HG3. These images are referred to as images A, B, and C, respectively. The homography matrix from A to B, from B to C, and from C to B were all estimated using user-selected points; automatically selected points from the Harris detector; and MATLAB implementations for the Harris detector and SURF algorithm.
 
 % Need to show automatic vs. manual for a pair of pictures
 % Need to visualise those homographies
 % Need to analyse those homographies for translation/rotation/projection things
+
+For the automatic point selection, the most successful image pair was from image B to image C. The matrices $\textbf{H}_{man}$ and $\textbf{H}_{auto}$ represent the homography matrices estimated from user-selected points and Harris-detected points, respectively. These transformations are also visualised in Figure \ref{fig:matchBC}, which shows that $\textbf{H}_{man}$ is closer to the true matrix, as the edges and objects within the images line up more closely and there is less blur.
+
+% Select pair B->C as it is the only working pair
+
+\begin{equation} \label{eqn:manHomog}
+\textbf{H}_{man} = \begin{bmatrix}
+     1.5542 &  0.5391 & -533.90 \\
+    -0.5575 &  1.5585 &  92.584 \\
+    -0.0000 &  0.0000 &  1.0000
+\end{bmatrix}
+\end{equation}
+
+\begin{equation} \label{eqn:autoHomog}
+\textbf{H}_{auto} = \begin{bmatrix}
+     1.7543 &  0.6687 & -645.30 \\
+    -0.5892 &  1.8003 &  47.431 \\
+     0.0000 &  0.0001 &  1.0000
+\end{bmatrix}
+\end{equation}
+
+These matrices can be analysed as similarity matrices, yielding a scale factor change, a rotation, and a translation. The x, y translation are given by $h_{13}$ and $h_{23}$ of each matrix respectively; there seems to be a significant difference between the two. As the scale and rotation are multiples, these are more complex to compute. As such, a script was used to compute the scale factor from the mean of the sine terms and the mean of the cosine terms, adjusting the angle until the two scale factors are very close. This computation shows that $\textbf{H}_{auto}$ has a rotation of 19.49\degree, and a scale factor of 1.885; $\textbf{H}_{man}$ has a rotation of 21.5\degree, and a scale factor of 1.67. As the camera was intended to be rotated by 20\degree, and scaled by factor 1.5, this latter matrix represents the transformation more accurately. Information on how the scale factor, rotation, and translation appear in the matrix can be found in the course notes \cite{notes}.
+
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b1_BC_pair}
+      \caption{$\textbf{H}_{man}$ matrix}
+      \label{fig:manHomog}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b2_BC_pair}
+      \caption{$\textbf{H}_{auto}$ matrix}
+      \label{fig:autoHomog}
+    \end{subfigure}
+
+	\caption{Transformation given by homography matrix between images B and C, with B in purple and C in green}
+  \label{fig:matchBC}
+\end{figure}
+
+% TODO discuss the rest of the pairs and how it compares to MATLAB's implementation of Harris/SURF, and why each only works in particular cases
+% Meng, I don't really know what to write for this section, okay if I leave this bit for you?
 
 
 \subsubsection{Number of Correspondences}
@@ -282,11 +327,83 @@ To determine the success of automatic point detection, user-selected and automat
 % Find the number of outliers
 % Explain how you found the outliers
 
+To test how the homography changes with different parameters of the full estimation algorithm, a number of tests were run which varied the threshold of the Harris detector for each image and the resolution of the histogram descriptor for each patch by specifying the number of bins.
+
+% TODO what was the result of these tests?
+
+The number of outliers for the entire algorithm was measured by varying the detector threshold to change the number of corresponding points, then the accuracy taken using the function found in \texttt{errorHA.m}. The result is shown in Figure \ref{fig:outliers}. The error decreases with number of points, being steady from around 80 corresponding points upwards. The error spikes heavily when there are few points, showing that using a few points can produce reasonable results but is not reliable.
+
+% TODO anything else to say here?
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{pic/q2_1_c}
+  \caption{Graphs of HA against number of corresponding points}
+  \label{fig:outliers}
+\end{figure}
 
 \subsection{Stereo Vision With FD Pictures}
 
+% Estimate fundamental matrix from manual points with FD pics
+% Calculate epipoles for A,B and show
 
-\cite{notes}
+This section uses the FD set of images, with FD1, FD2, and FD3 being 0cm, 20cm, and 40cm displaced from the original image, respectively. For each pair FD1 and FD2, FD2 and FD3, FD3 and FD1, the fundamental matrix is estimated and the epipoles and epipolar lines calculated. The fundamental matrix of the first pair is given in Equation \ref{eqn:fundamentalFD}, estimated using user-selected correspondences. The epipolar lines and epipoles for the same pair are given in Figure \ref{fig:fdEpipoles}.
+
+\begin{equation} \label{eqn:fundamentalFD}
+\textbf{F} = \begin{bmatrix}
+     0.0000 & -0.0000 &  0.0234 \\
+     0.0000 &  0.0000 & -0.1198 \\
+    -0.0259 &  0.1235 &  1.0000
+\end{bmatrix}
+\end{equation}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{pic/q2_2_ab_A_0}
+  \caption{Epipoles and epipolar lines between images FD1 and FD2}
+  \label{fig:fdEpipoles}
+\end{figure}
+
+Following the calculation of epipoles and epipolar lines, the same pair of images were used to calculate both a disparity map and depth map. These are displayed in Figure \ref{fig:depth10}. The depth maps were both then calculated again, first by changing the focal length by 2mm to investigate the effect of change in depth, and by adding Gaussian noise to investigate the effect of noise on the maps. These results are shown in Figure \ref{fig:depthChanges}.
+
+% TODO discuss results from the generated images
+% TODO discuss the difference between epipolar and stereoscopic images
+% Meng, do you want to handle this as well?
+
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_2_cd3_dis}
+      \caption{Disparity map}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_2_cd3_depth10}
+      \caption{Depth map}
+    \end{subfigure}
+
+	\caption{Depth and Disparity maps from FD1 and FD2 images using 10x10 window size and depth predicted by epipolar lines}
+  \label{fig:depth10}
+\end{figure}
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_2_e_focal2}
+      \caption{Depth map with 2mm increase in focal length}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_2_e_gaussian}
+      \caption{Depth map with image and added Gaussian noise}
+    \end{subfigure}
+
+  \caption{Depth maps generated using 10x10 window size, depth predicted by epipolar lines, and changes to calculation method}
+  \label{fig:depthChanges}
+\end{figure}
 
 
 %-------------------------------------------------------------------------------

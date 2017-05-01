@@ -119,11 +119,11 @@ hold on;
 plot(xpoints, ypointsA, 'b');
 plot(xpoints + imgWidth, ypointsB, 'g');
 % Points
-scatter(coordA(1, :), coordA(2, :), 50, 'o', 'filled', 'b');
-scatter(coordB(1, :)+ imgWidth, coordB(2, :), 50, 'o', 'filled', 'g');
+scatter(coordB(1, :), coordB(2, :), 50, 'o', 'filled', 'b');
+scatter(coordA(1, :)+ imgWidth, coordA(2, :), 50, 'o', 'filled', 'g');
 % Numbering
-text(coordA(1, :), coordA(2, :), num2cell(1:9), 'FontSize', 20, 'color', 'g');
-text(coordB(1, :)+ imgWidth, coordB(2, :), num2cell(1:9), 'FontSize', 20, 'color', 'b');
+text(coordB(1, :), coordB(2, :), num2cell(1:9), 'FontSize', 20, 'color', 'g');
+text(coordA(1, :)+ imgWidth, coordA(2, :), num2cell(1:9), 'FontSize', 20, 'color', 'b');
 hold off;
 % Formatting and saving
 set(findall(gcf,'type','text'),'fontSize',25);

@@ -93,15 +93,15 @@
 % Abstract
 %-------------------------------------------------------------------------------
 
-\begin{abstract}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viverra sollicitudin. Nulla ornare enim in ante auctor rhoncus a vel nulla. Nulla condimentum massa rhoncus, sodales arcu a, euismod nulla. Proin viverra mauris at massa molestie, a ultricies tortor fermentum. Duis consectetur, ante a tincidunt euismod, augue diam varius dolor, ut vestibulum orci est sit amet mi. Aenean sit amet metus vitae sem malesuada tempus. Vivamus placerat ornare erat quis tincidunt. In quis massa aliquet, pellentesque magna vitae, luctus eros.
-
-\end{abstract}
+% \begin{abstract}
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viverra sollicitudin. Nulla ornare enim in ante auctor rhoncus a vel nulla. Nulla condimentum massa rhoncus, sodales arcu a, euismod nulla. Proin viverra mauris at massa molestie, a ultricies tortor fermentum. Duis consectetur, ante a tincidunt euismod, augue diam varius dolor, ut vestibulum orci est sit amet mi.
+%
+% \end{abstract}
 
 %-------------------------------------------------------------------------------
 % Introduction
 %-------------------------------------------------------------------------------
-\section{Introduction}
+% \section{Introduction}
 % Paper considers what?
 % What data is used?
 % What are the methods discussed? Short explanations
@@ -110,7 +110,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 \subsection{Manual Point Matching}
 
 % Maybe a bit overkill considering our page limit, butt fuck it
-Although automatic feature selection is preferable for computer vision, a valuable tool for checking how the algorithms work is to allow a user to manually select interest points. Five pairs of points are selected by the user, which are then assumed to match, removing the need for automatic point selection and patch matching. The MATLAB code to do this is found in the Appendix as file \texttt{q1\_manual.m}. An example of two images with the selected data points is shown in Figure \ref{fig:manual}.
+In this method, five pairs of points are selected by the user. The MATLAB code to do this is found in the Appendix as file \texttt{q1\_manual.m}. An example of two images with the selected data points is shown in Figure \ref{fig:manual}.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -128,16 +128,15 @@ Although automatic feature selection is preferable for computer vision, a valuab
     \end{subfigure}
 
 	\caption{Example of manually selected data points on images}
+    \vspace{-0.75cm}
   \label{fig:manual}
 \end{figure}
-
 \subsection{Automatic Point Matching }
 \subsubsection{Interest Point Detection}
 % Discuss need for interest point selection
-For many computer vision applications, detecting features within an image or the same features within multiple images is crucial. These features can take a number of shapes, such as edges or corners. Once the same detector is run on two images with some of the same features, such as overlapping features in a panorama, the features can be automatically matches and a transformation estimated between the images.
 
 % Discuss implemented selectors - TODO discuss the example images?
-Both Hessian and Harris selectors have been implemented for this application. Both differentiate the given image twice and compare the results to a threshold, where calculations with the results vary depending on the detector. From subjective use of each detector, the Harris algorithm was found to perform more effectively. Both algorithms are based on code written by Svetlana Lazebnik \cite{harrisdetector}, and may be found in the Appendix as files \texttt{hessian.m} and \texttt{harris.m}. Images showing interest points detected by the two detectors are shown in Figure \ref{fig:detectors}. These images show an unexpected result in that many of the detected features seem to be part of uniform patches of image; this may suggest an insufficiently large threshold. The threshold was adjusted in future sections to yield the most suitable number of points.
+Feature detection is crucial in finding corresponding points for transformation estimation. Both Hessian and Harris selectors were implemented. From subjective use of each detector, the Harris algorithm was found to perform more effectively. Both algorithms are based on code written by Svetlana Lazebnik \cite{harrisdetector}, and may be found in the Appendix as files \texttt{hessian.m} and \texttt{harris.m}. Images showing interest points detected by the two detectors are shown in Figure \ref{fig:detectors}. These images show that many of the detected features seem to be part of uniform patches of image; the threshold was adjusted in future sections to yield the most suitable number of points.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -155,54 +154,51 @@ Both Hessian and Harris selectors have been implemented for this application. Bo
     \end{subfigure}
 
 	\caption{Examples of Harris and Hessian detectors operating on Kitchen image}
+    \vspace{-0.5cm}
+
   \label{fig:detectors}
 \end{figure}
 
 \subsubsection{Point and Patch Description}
 % Discuss need for description & our implementation
-Once features have been detected in the image, these points must have some description to allow comparison with other points. At first, each interest point was used at the top left corner of a fixed-size (32 by 32) patch, limiting the point so as not to cross the border. However, this removed some information due to the border limiting and the patch position missing out on rotation information if matching between images; therefore, the interest point is the centre of a patch in a padded image The padded image is found by replicating the border pixels outwards. This may be found in the Appendix as \texttt{describe2.m}. The patch is then converted into a 64 bin histogram for comparison. This value was varied, and experimentally determined to be the most suitable for matching.
+Once features have been detected in the image, each point is taken as the centre of a 32 x 32 patch. To allow patches at the border, the image is padded by replicating the border pixels outwards. This may be found in the Appendix as \texttt{describe2.m}. The patch is then converted into a 64 bin histogram for comparison. This bin number was varied, and experimentally determined to be the most suitable for matching.
 
 \subsubsection{Patch Matching}
 % Discuss patch matching implementation - could really do with a side-by-side with lines connecting matched patches
-Once each interest point has a corresponding descriptor, the points from two different images can be compared. The simplest method for comparing these descriptors is to use nearest neighbour (NN) matching, which interprets the difference in histograms as an error, and matches the points with the least error. Furthermore, the interest points from each image are considered in turn, and only if a pair of patches are both nearest neighbours to each other are they considered to match. The algorithm for this is shown in  the Appendix as \texttt{matchPatches.m}.
+Once each interest point has a corresponding descriptor, the points from two images are compared. The nearest neighbour (NN) matching was used, which interprets the difference in histograms as an error, and matches the points with the least error. Furthermore, the interest points from each image are considered in turn, and only if a pair of patches are both nearest neighbours to each other are they considered to match. The algorithm for this is shown in the Appendix as \texttt{matchPatches.m}.
 
-An example image of two images with matching points is shown in Figure \ref{fig:matched}. The images used are the same as in Figure \ref{fig:manual}, but the threshold of 3000 with the Harris detector were used, which would indicate a similar number of feature points as in Figure \ref{fig:harris3000}. After NN matching, the number of points has been vastly reduced and mostly correspond, with a couple of exceptions, such as the green line between the coffee pot and the coffee machine pod. These points are not the same, but the surrounding area is very similar, which causes the error. Those are the source of the outliers.
+An example image of two images with matching points is shown in Figure \ref{fig:matched}. The images used are the same as before analysed with a threshold of 3000 with the Harris detector. After NN matching, the number of points has been vastly reduced and mostly correspond, with a couple of exceptions, such as the green line between the coffee pot and the coffee machine pod. These points are not the same, but the surrounding area is very similar. Those are the source of the outliers.
 
 % I did also create this figure with showMatchedFeatures, but I found it really hard to spot where the differences are, so I did it like this. I can upload the matchedFeatures version if you want, just ask
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=\linewidth]{pic/matches}
   \caption{Matched patches between original image and image zoomed by factor 1.5 and tilted by 20\degree}
+  \vspace{-0.5cm}
   \label{fig:matched}
 \end{figure}
-
-
-% \begin{enumerate}
-%     \item Harris Detector Method. PIC: img1 with points on it, show with different thresholds.
-%     \item Patch Extraction and Features Method. PIC: Example patches extracted, resulting histograms example. Do we definitely have to visualise this? Seems like it would take loads of space
-%     \item NN Matching Method PIC: Using img1 and img2 with
-%     \texttt{showMatchedFeatures(imgA, imgB, matchedPoints1, matchedPoints2);} to show result.
-% \end{enumerate}
 
 \subsection{Transformation Estimation}
 
 % Need to discuss homography matrix estimation and show example
 \subsubsection{Homography Matrix}
-The matching pairs of points can be used to estimate the transformation matrix between the two images, known as the homography matrix. The homography matrix is \textbf{H}, and must satisfy Equation \ref{eqn:homography}, where $\textbf{x}_\textbf{A}$ is the original point and $\textbf{x}_\textbf{B}$ is the destination point after the transformation. The method for this is discussed in the course notes and during the lectures\cite{notes}; as such, the formulas will not be repeated, with the full details of implementation given in the source code in the Appendix, file \texttt{estTransformMat.m}.
-
+The matching pairs of points can be used to estimate the transformation matrix between the two images, known as the homography matrix. The homography matrix is \textbf{H}, and must satisfy Equation \ref{eqn:homography}, where $\textbf{x}_\textbf{A}$ is the original point and $\textbf{x}_\textbf{B}$ is the destination point after the transformation. The method is discussed in the course notes and during the lectures \cite{notes}; the formulas will not be repeated, with the full details of implementation given in the source code in the Appendix, file \texttt{estTransformMat.m}.
+\vspace{-0.15cm}
 \begin{equation} \label{eqn:homography}
     \textbf{x}_\textbf{B} = \textbf{Hx}_\textbf{A}
 \end{equation}
+\vspace{-0.5cm}
 
 %% Move from here.
 \subsubsection{Homography Tranformation}
-A routine was written to take the points in Image A, and project them onto the same axes as Image B. The difficulty was setting the new points to fit within MATLAB's array indexing. To compensate for this, the function also creates a reference object that MATLAB uses to map values to the negative axes while keeping the indices valid. Figure \ref{fig:boat13} shows the result of manually selecting points on the boat example images \cite{boat}, estimating the homography, and projecting the points through the homography matrix. While the projection method and estimation method both work well, there is slight error, shown by the green and purple parts where the images do not overlap. The function can be found in \texttt{projection.m} (Note: While the projection method was written, the simultaneous display function was done with MATLAB, as that was not part of this assignment.)
+A routine was written to take the points in Image A, and project them onto the same axes as Image B. To deal with MATLAB's array indexing, the function also creates a reference object that MATLAB uses to map values to the negative axes while keeping the indices valid. Figure \ref{fig:boat13} shows the result of manually selecting points on the boat example images \cite{boat}, estimating the homography, and projecting the points through the homography matrix. While the projection method and estimation method both work well, there is slight error, shown by the green and purple parts where the images do not overlap. The function can be found in \texttt{projection.m} (The simultaneous display function was done with MATLAB, as that was out of scope.)
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=0.9\linewidth]{pic/q2_1_b4_1_3_pair}
+  \includegraphics[width=0.75\linewidth]{pic/q2_1_b4_1_3_pair}
   \caption{Image A (Boat 1) transformed and overlaid on Image B (Boat 3)}
   \label{fig:boat13}
+  \vspace{-0.5cm}
 \end{figure}
 %% Move end here.
 
@@ -212,26 +208,18 @@ To estimate how well a homography matrix matches the two sets of points together
 
 % Need to discuss fundamental matrix estimation (and show example?)
 \subsubsection{Fundamental Matrix}
-Another matrix used in computer vision is the fundamental matrix, which can be estimated using a series of corresponding points. This matrix can be used to constrain the possible locations of points in a second image from points in the first image given the fundamental matrix between the two images. The method itself is very similar to the homography matrix, except that the relation in Equation \ref{eqn:fundamental} is used instead of that in Equation \ref{eqn:homography}. The code for implementation is given in the Appendix as file \texttt{estFundamentalMat.m}.
-
+Another matrix is the fundamental matrix, which can be estimated using a series of corresponding points. This matrix can be used to constrain the possible locations of points in a second image from points in the first image given the fundamental matrix between the two images. The method itself is very similar to the homography matrix, except that the relation in Equation \ref{eqn:fundamental} is used instead of that in Equation \ref{eqn:homography}. The code for implementation is given in the Appendix as file \texttt{estFundamentalMat.m}.
+\vspace{-0.15cm}
 \begin{equation} \label{eqn:fundamental}
     \textbf{x}_\textbf{B}^T\textbf{Fx}_\textbf{A} = 0
 \end{equation}
+\vspace{-0.5cm}
 
 % Discuss epipole lines and show example
 \subsubsection{Epipoles and Epipolar Lines}
-The fundamental matrix means the epipole of Image A, $\textbf{e}_\textbf{A}$, can be calculated through the relationship $\textbf{Fx}_\textbf{A} = 0$. This is the intersection of every epipolar line, which means the epipolar line of each point in Image A can be found. However, more useful is the corresponding epipolar line in Image B, as that is where the corresponding point will be found. In other words, for $\textbf{x}_\textbf{A}$, $\textbf{x}_\textbf{B}$ is found on the line $\textbf{l}_\textbf{B}=\textbf{Fx}_\textbf{A}$ \cite{mit}.
+The fundamental matrix means the epipole of Image A, $\textbf{e}_\textbf{A}$, can be calculated through the relationship $\textbf{Fe}_\textbf{A} = 0$. This is the intersection of every epipolar line, which means the epipolar line of each point in Image A can be found. However, more useful is the corresponding epipolar line in Image B, as that is where the corresponding point will be found. In other words, for $\textbf{x}_\textbf{A}$, $\textbf{x}_\textbf{B}$ is found on the line $\textbf{L}_\textbf{B}=\textbf{Fx}_\textbf{A}$ \cite{mit}.
 
 As an example, images from the Tsukuba image set \cite{tsukuba} have been used, shown in Figure \ref{fig:epipolar}. The corresponding points were manually obtained, before the fundamental matrix, epipoles, and epipolar lines were found. The function used to generate the epipole of an image and the epipolar lines of each point in both images is given in the Appendix as file \texttt{epiPolesLines.m}.
-
-%% Not sure if needed.
-% \begin{equation} \label{eqn:fundamentalEstimated}
-% \textbf{F} = \begin{bmatrix}
-%      0.0001 &  0.0005 &  0.0494 \\
-%     -0.0007 & -0.0000 & -0.6736 \\
-%     -0.0849 &  0.7735 &  1.0000
-% \end{bmatrix}
-% \end{equation}
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -249,69 +237,64 @@ As an example, images from the Tsukuba image set \cite{tsukuba} have been used, 
     \end{subfigure}
 
 	\caption{Epipoles and epipolar lines.}
+    \vspace{-0.75cm}
   \label{fig:epipolar}
 \end{figure}
 
-
 \section{Question - Image Geometry}
-The kitchen images used thus far in this paper have been taken by the authors; as such, parameters of the images are known. The FD set has a 20cm displacement between each of the three images, with all other parameters the same, and a focal length of 24mm. The HG set is taken without displacing the camera; the first image is level with 24mm focal length; the second is tilted by $20\degree$, taken with 36mm focal length; the third image is tilted by $40\degree$ with 56mm focal length.
+The FD set used has a 20cm displacement between each of the three images, with all other parameters the same, and a focal length of 24mm. The HG set is taken without displacing the camera; the second is tilted by $20\degree$; the third image is tilted by $40\degree$.
 
 \subsection{Homography with HG Pictures}
 \subsubsection{Reduced Size}
-The image HG1 was used for this test, with the Harris detector and a threshold of 500 used to detect interest points. The image was then scaled down to half its original size in both width and height, and the same Harris detector run on the result. The two sets of resulting points were matched as previously described. The average distance between the matched points, or HA error, was calculated as 0.5995. Therefore, although there are far more interest points detected with the larger resolution image, the points that are matched between the two images are very close to each other. The points can be seen in Figure \ref{fig:reducedcompare}.
+The image HG1 was used for this test, with the Harris detector and a threshold of 500. The image was then scaled down to half its original width and height, and the same Harris detector run again. The two sets of points were matched as previously described. The HA error between the two sets of points, was calculated as 0.5995. Therefore, although there are more interest points detected with the larger resolution image, the points that are matched between the two images are very close to each other. The points can be seen in Figure \ref{fig:reducedcompare}. There just appear to be more points at each cluster.
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=\linewidth]{pic/q2_1_a_imgBoth}
-  \caption{Image HG1 with original size interest points in blue and interest points from reduced image in green.}
+  \includegraphics[width=0.75\linewidth]{pic/q2_1_a_imgBoth}
+  \caption{Image HG1 with original size interest points in blue and interest points from reduced image in green.}\vspace{-.5cm}
   \label{fig:reducedcompare}
 \end{figure}
 
 \subsubsection{Manual vs. Automatic}
 % Harris 4K points for 500 threshold
-To determine the success of automatic point detection, user-selected and automatic point selection were both used to determine the homography matrices between HG1, HG2, and HG3. These images are referred to as images A, B, and C, respectively. The homography from A to B, from B to C, and from C to B was first done manually. All worked as expected. Pair BC is in Figure \ref{fig:manHomog}. The success shows the effectiveness of the algorithms used.
+To evaluate automatic point detection, user-selected and automatic point selection were both used to determine the homography matrices between HG1 (A), HG2 (B), and HG3 (C). The homography from A to B, from B to C, and from C to B was first done manually. All worked as expected. Pair BC is in Figure \ref{fig:manHomog}. The success shows the effectiveness of the algorithms used.
 
-However, when the automatic detection system was used, the homography matrices were completely wrong. This was no doubt due to the presence of outliers. To deal with this, a number of methods were used. The one that worked is known as RANdom SAmple Consensus, or RANSAC \cite{ransac}. This method of removing outliers works through the following steps. The implementation can be found in \texttt{myRANSAC.m} in the Appendix.
-\begin{enumerate}
-    \item Randomly select minimum number of points from data set to form the model. In this case, 4.
-    \item Calculate model. Measure deviation from model of each point in data set.
-    \item Find the subset that lies within a specified margin of the model. Measure the size of that subset.
-    \item Repeat 1. and 2. as many times as desired.
-    \item Keep the largest subset from all the iterations. These are the inliers.
-\end{enumerate}
-This was run on all the matching pairs before the homography estimates were done. To test this, the boat data was used again, as seen in Figure \ref{fig:boatmatches}, which shows some of the results of the automatic detection with RANSAC. The success shows the validity of our methods and functions.
+However, when the automatic detection system was used, the homography matrices were wrong. This was due to the presence of outliers. The method used to remove them is known as RANdom SAmple Consensus, or RANSAC \cite{ransac}. The implementation can be found in \texttt{myRANSAC.m} in the Appendix.
+
+This was run on the matching pairs before the homography estimates were done. To test this, the boat data was used again, as seen in Figure \ref{fig:boatmatches}, which shows some of the results of the automatic detection with RANSAC. The success shows the validity of our methods and functions.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
   \centering
-    \begin{subfigure}{0.3\linewidth}
+    \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\textwidth]{pic/q2_1_b4_1_2_pair}
       \caption{1 and 2.}
       \label{fig:boatmatch12}
     \end{subfigure}
     ~
-    \begin{subfigure}{0.3\linewidth}
+    \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\textwidth]{pic/q2_1_b4_1_3_pair}
       \caption{1 and 3.}
       \label{fig:boatmatch13}
   \end{subfigure}
   \\
-  \begin{subfigure}{0.3\linewidth}
+  \begin{subfigure}{0.45\linewidth}
     \includegraphics[width=\textwidth]{pic/q2_1_b4_2_3_pair}
     \caption{2 and 3.}
     \label{fig:boatmatch23}
   \end{subfigure}
   ~
-  \begin{subfigure}{0.3\linewidth}
+  \begin{subfigure}{0.45\linewidth}
     \includegraphics[width=\textwidth]{pic/q2_1_b4_3_4_pair}
     \caption{3 and 4.}
     \label{fig:boatmatch34}
 \end{subfigure}
 	\caption{HG results for boat with RANSAC.}
+    \vspace{-0.5cm}
   \label{fig:boatmatches}
 \end{figure}
 
-However, when the same method was applied to our pictures, only the BC pair worked, in Figure \ref{fig:autoHomog}. As such, only the pair BC is further analysed. However, to make sure that it was not our algorithm, MATLAB's Harris detection, matching, and homography estimation methods were used as reference. Strangely enough, MATLAB was able to work out the AB pair, but neither the BC nor the CA pair! In contrast, the SURF methods of MATLAB were able to work out all 3 pairs. The written methods had a success rate of 33\%, on par with the MATLAB methods. Combining this observation with the success of with the boat photos suggests that the Harris detection was simply not suitable for the HG photos. The image results from the MATLAB Harris and SURF are found in the Appendix.
+However, when the same method was applied to our pictures, only the BC pair worked, in Figure \ref{fig:autoHomog}. However, to make sure that it was not our algorithm's fault, MATLAB's Harris methods were used as reference. MATLAB was able to work out the AB pair, but neither the BC nor the CA pair! In contrast, the SURF methods of MATLAB were able to work out all 3 pairs. Our methods had a success rate of 33\%, on par with the MATLAB methods. Combining this observation with the success of the boat photos suggests that the Harris detection was not suitable for the HG photos. The image results from the MATLAB methods are found in the Appendix.
 
 % Need to show automatic vs. manual for a pair of pictures
 % Need to visualise those homographies
@@ -337,7 +320,7 @@ The matrices $\textbf{H}_{man}$ and $\textbf{H}_{auto}$ represent the homography
 \end{bmatrix}
 \end{equation}
 
-These matrices can be analysed as similarity matrices, yielding a scale factor change, a rotation, and a translation. The x, y translation are given by $h_{13}$ and $h_{23}$ of each matrix respectively; there seems to be a significant difference between the two. As the scale and rotation are multiples, these are more complex to compute. As such, a script was used to compute the scale factor from the mean of the sine terms and the mean of the cosine terms, adjusting the angle until the two scale factors are very close. This computation shows that $\textbf{H}_{auto}$ has a rotation of 19.49\degree, and a scale factor of 1.885; $\textbf{H}_{man}$ has a rotation of 21.5\degree, and a scale factor of 1.67. As the camera was intended to be rotated by 20\degree, and scaled by factor 1.5, this latter matrix represents the transformation more accurately. Information on how the scale factor, rotation, and translation appear in the matrix can be found in the course notes \cite{notes}.
+These matrices can be analysed as similarity matrices, yielding a scale factor change, a rotation, and a translation \cite{notes}. The $<x, y>$ translation are given by $h_{13}$ and $h_{23}$ of each matrix; there seems to be a significant difference between the two. As the scale and rotation are multiples, these are more complex to compute. A script was used to compute the scale factor from the mean of the sine terms and the mean of the cosine terms, adjusting the angle until the two scale factors are close. This computation shows that $\textbf{H}_{auto}$ has a rotation of 19.49\degree, and a scale factor of 1.885; $\textbf{H}_{man}$ has a rotation of 21.5\degree, and a scale factor of 1.67. As the camera was rotated by 20\degree, and zoomed by 1.5, this latter matrix represents the transformation better.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -355,6 +338,8 @@ These matrices can be analysed as similarity matrices, yielding a scale factor c
     \end{subfigure}
 
 	\caption{Transformation given by homography matrix between images B and C, with B in purple and C in green}
+    \vspace{-0.5cm}
+
   \label{fig:matchBC}
 \end{figure}
 
@@ -369,14 +354,15 @@ These matrices can be analysed as similarity matrices, yielding a scale factor c
 % Explain how you found the outliers
 
 % TODO what was the result of these tests?
-For the pair BC that worked, the original number of matches was 439. The number of points used was to 278. Thus, the number of outliers was 161. As mentioned above, RANSAC was used to remove the outliers. Thus, the number of inlier points was considered in this question. Of the 278 points, a certain number would be randomly selected to calculate the homography matrix, before the HA was calculated. That number varied from 4 to 278. The result is shown in Figure \ref{fig:outliers}. The error decreases with number of points, being steady from around 80 corresponding points upwards. The error spikes heavily when there are few points, showing that using a few points can produce reasonable results but is not reliable. In other words, the post-RANSAC selection of points still contains some outliers, but they are much rarer than before. However, once only a certain random subset of the post-RANSAC points are selected, there is a chance that a selection will contain more outliers that the homography estimation can cope with, thus causing spikes in errors. At small numbers, the chances of selecting only the valid points are higher, hence the lower error.
+For the pair BC that worked, the original number of matches was 439. The number of inliers was 278; the number of outliers was 161. As mentioned, RANSAC was used to remove the outliers. The number of inlier points was considered and between 4 and 278 were randomly selected to calculate the homography matrix, before the HA was calculated. The result is shown in Figure \ref{fig:outliers}. The error is low and constant at high numbers. The error spikes heavily as this decreases, but drops when there are very few points. In other words, the post-RANSAC selection of points still contains some outliers, but they are much rarer than before. However, once a certain subset of the post-RANSAC points are selected, there is a higher chance that a selection will contain more outliers that the homography estimation can cope with. At small numbers, the chances of selecting only the valid points are higher, hence the lower error.
 
 % TODO anything else to say here?
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=\linewidth]{pic/q2_1_c}
+  \includegraphics[width=0.75\linewidth]{pic/q2_1_c}
   \caption{Graphs of HA against number of corresponding points}
+  \vspace{-0.5cm}
   \label{fig:outliers}
 \end{figure}
 
@@ -400,15 +386,16 @@ This section uses the FD set of images, with FD1, FD2, and FD3 being 0cm, 20cm, 
   \centering
   \includegraphics[width=\linewidth]{pic/q2_2_ab_A_0}
   \caption{Epipoles and epipolar lines between images FD1 and FD2}
+  \vspace{-0.5cm}
   \label{fig:fdEpipoles}
 \end{figure}
 
 \subsubsection{Disparity}
-To calculate disparity, the method of Sum Squared Differences (SSD) was used. The Image A (FD1) into windows, and then searching for the most similar window in Image B. The difference in $x$ values of the centers of the window in A and the matching window in B is the disparity. To reduce the amount of searching, the points selected in Image B for comparison are limited to those on the epipolar line in B corresponding to the centre of the window in A.
+To calculate disparity, the method of Sum Squared Differences (SSD) was used. FD1 (A) is split into windows, and the most similar window in searched for in FD2 (B). The difference in $x$ values of the centers of the window in A and the matching window in B is the disparity. To reduce the amount of searching, the points selected in B for comparison are limited to those on the epipolar line in B corresponding to the centre of the window in A.
 
-However, if the pictures are coplanar, the method may not be as effective as the search should happen along the horizontal line, even if the calculated epilines are not parallel. To test this, the Tsukuba data was used again, shown in Figure \ref{fig:q2_2_cd_tkb}. It shows that if the pictures are coplanar, even if the calculated epipolar lines are not parallel, using parallel horizontal lines yields better results.
+However, if the pictures are coplanar, the method may not be as effective as the search should happen along the horizontal line, even if the calculated epipolar lines are not parallel. To test this, the Tsukuba data was used again, shown in Figure \ref{fig:q2_2_cd_tkb}. It shows that if the pictures are coplanar, even if the calculated epipolar lines are not parallel, using parallel horizontal lines yields better results.
 
-As such, for FD1 and FD2, only horizontal lines were searched, as the camera was only moved horizontally. The disparity map is shown in \ref{fig:depth10}.  However, the Tsukuba example shows proof that an epipolar line search method was written.
+As such, for A and B, only horizontal lines were searched, as the camera was only moved horizontally. The disparity map is shown in \ref{fig:depth10}.  However, the Tsukuba example shows proof that an epipolar line search method was written and would work for other non-coplanar pictures.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -426,29 +413,32 @@ As such, for FD1 and FD2, only horizontal lines were searched, as the camera was
     \end{subfigure}
 
 	\caption{Comparison of disparity calculation along epipolar lines and along horizontal lines for Tsukuba data. }
+    \vspace{-0.5cm}
   \label{fig:q2_2_cd_tkb}
 \end{figure}
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=\linewidth]{pic/q2_2_cd4_dis}
+  \includegraphics[width=0.75\linewidth]{pic/q2_2_cd4_dis}
   \caption{Disparity map for FD1 using FD2, with 10x10 window size. Using horizontal lines.}
+  \vspace{-0.25cm}
   \label{fig:depth10}
 \end{figure}
 
 \subsubsection{Depth}
-To convert from disparity to depth ($z$), the formula $z = \frac{fb}{d}$, where $f$ is the focal length, $b$ is the baseline, and $d$ is the disparity. The absolute value of the disparity was taken as there cannot be negative distance in this case. Figure \ref{fig:depth} shows this. The window size was chosen because any larger, and the blockiness of the image made it impossible to conclude anything useful. The results are as expected, with the red portions (a higher depth) being mostly in the centre, around the window and the far side of the kitchen. The left and right parts of the image should be closer, and there is more blue, but there are outliers, like a large patch of red on the left, and light green as well. The fridge is surprisingly blue. It seems that the areas of white wall in the original image might be responsible. Upon closer inspection, the picture does have a lot of uniform white areas, which may have caused issues with feature recognition in earlier segments as well. However, this is again the result of the image, rather than the method, as evidenced by the success of the identical code with the Tsukuba data. 
+To convert from disparity to depth ($z$), the formula $z = \frac{fb}{d}$, where $f$ is the focal length, $b$ is the baseline, and $d$ is the disparity. The absolute value of the disparity was taken as there cannot be negative distance. Figure \ref{fig:depth} shows this. The window size empirical chosen for the best result. The results are as expected, with the red portions (a higher depth) being mostly in the centre, around the window and the far side of the kitchen. The left and right parts of the image should be closer, and there is more blue, but there are outliers. A large patch of red is on the left, as is a light green one The fridge is surprisingly blue. Upon closer inspection, the picture does have a lot of uniform white areas (wall, ceiling, fridge), which may have caused issues with feature recognition in earlier segments as well. However, this is again the result of the image, rather than the method, as evidenced by the success of the identical code with the Tsukuba data.
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=\linewidth]{pic/q2_2_cd4_depth}
+  \includegraphics[width=0.75\linewidth]{pic/q2_2_cd4_depth}
 	\caption{Depth map for FD1 using FD2, with 10x10 window size. $f = 24\text{mm}$, $b = 20\text{cm}$.}
+    \vspace{-0.5cm}
   \label{fig:depth}
 \end{figure}
 
 \subsubsection{Focal Length and Noise}
 
-The depth map was calculated again, with $f = 22\text{mm}$, then with $f = 26\text{mm}$ and finally with $f = 24\text{mm}$ again, but adding Gaussian noise to the disparity map. Increasing the focal length should make everything further away, and reducing it vice-versa. This is visible as a slight shift to red in Figure \ref{fig:q2_2_e_focal1}, and more blue in Figure \ref{fig:q2_2_e_focal2}. Adding noise shown in Figure \ref{fig:q2_2_e_gaussian} appears to have no effect, whether at small or large amounts, as it either has no visible effort, or simply makes the depth map filled with artefacts. .
+The depth map was calculated again, with $f = 22\text{mm}$, then with $f = 26\text{mm}$ and finally with $f = 24\text{mm}$ again, but adding Gaussian noise to the disparity map. Increasing the focal length should make everything further away, and reducing it vice-versa. This is visible as a slight shift to red in Figure \ref{fig:q2_2_e_focal1}, and more blue in Figure \ref{fig:q2_2_e_focal2}. However, this was very little. Adding noise shown in Figure \ref{fig:q2_2_e_gaussian} appears to have no effect, whether at small or large amounts, as it either has no visible effort, or simply makes the depth map filled with artefacts.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -466,13 +456,15 @@ The depth map was calculated again, with $f = 22\text{mm}$, then with $f = 26\te
     \end{subfigure}
 
     \caption{Depth map for FD1 using FD2, with 10x10 window size. $f = 24\text{mm}$, $b = 20\text{cm}$.}
+    \vspace{-0.5cm}
   \label{fig:q2_2_e_focal}
 \end{figure}
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=\linewidth]{pic/q2_2_e_gaussian}
+  \includegraphics[width=0.75\linewidth]{pic/q2_2_e_gaussian}
 	\caption{Depth map for FD1 using FD2, with $\sigma = 16$, capped at $\pm 50$.}
+    \vspace{-0.5cm}
   \label{fig:q2_2_e_gaussian}
 \end{figure}
 
@@ -480,8 +472,8 @@ The depth map was calculated again, with $f = 22\text{mm}$, then with $f = 26\te
 %-------------------------------------------------------------------------------
 % Conclusion
 %-------------------------------------------------------------------------------
-\section{Conclusion}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viverra sollicitudin. Nulla ornare enim in ante auctor rhoncus a vel nulla. Nulla condimentum massa rhoncus, sodales arcu a, euismod nulla. Proin viverra mauris at massa molestie, a ultricies tortor fermentum. Duis consectetur, ante a tincidunt euismod, augue diam varius dolor, ut vestibulum orci est sit amet mi. Aenean sit amet metus vitae sem malesuada tempus. Vivamus placerat ornare erat quis tincidunt. In quis massa aliquet, pellentesque magna vitae, luctus eros.
+% \section{Conclusion}
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viverra sollicitudin. Nulla ornare enim in ante auctor rhoncus a vel nulla. Nulla condimentum massa rhoncus, sodales arcu a, euismod nulla. Proin viverra mauris at massa molestie, a ultricies tortor fermentum. Duis consectetur, ante a tincidunt euismod, augue diam varius dolor, ut vestibulum orci est sit amet mi.
 
 %-------------------------------------------------------------------------------
 % References
@@ -511,12 +503,189 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 \lstinputlisting[style=Matlab-editor]{src/describe2.m}
 \newpage
 
+\subsection*{matchPatches.m}
+\lstinputlisting[style=Matlab-editor]{src/matchPatches.m}
+\newpage
+
 \subsection*{estTransformMat.m}
 \lstinputlisting[style=Matlab-editor]{src/estTransformMat.m}
 \newpage
 
+\subsection*{estFundamentalMat.m}
+\lstinputlisting[style=Matlab-editor]{src/estFundamentalMat.m}
+\newpage
+
+\subsection*{projection.m}
+\lstinputlisting[style=Matlab-editor]{src/projection.m}
+\newpage
+
+\subsection*{errorHA.m}
+\lstinputlisting[style=Matlab-editor]{src/errorHA.m}
+\newpage
+
 \subsection*{epiPolesLines.m}
 \lstinputlisting[style=Matlab-editor]{src/epiPolesLines.m}
+\newpage
+
+\subsection*{q1\_3\_d.m}
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q1_3_d_A}
+      \caption{Tsukuba 1 as Image A  with epipole and epipolar lines.}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q1_3_d_B}
+      \caption{Tsukuba 5 as Image B with epipoles and epipolar lines.}
+    \end{subfigure}
+
+	\caption{Epipoles and epipolar lines.}
+\end{figure}
+
+\lstinputlisting[style=Matlab-editor]{src/q1_3_d.m}
+\newpage
+
+\subsection*{q2\_1\_a.m}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{pic/q2_1_a_imgBoth}
+  \caption{Image HG1 with original size interest points in blue and interest points from reduced image in green.}
+\end{figure}
+
+\lstinputlisting[style=Matlab-editor]{src/q2_1_a.m}
+\newpage
+
+\subsection*{myRANSAC.m}
+
+\subsubsection{Method Description}
+\begin{enumerate}
+    \item Randomly select minimum number of points from data set to form the model. In this case, 4.
+    \item Calculate model. Measure deviation from model of each point in data set.
+    \item Find the subset that lies within a specified margin of the model. Measure the size of that subset.
+    \item Repeat 1. and 2. as many times as desired.
+    \item Keep the largest subset from all the iterations. These are the inliers.
+\end{enumerate}
+
+\lstinputlisting[style=Matlab-editor]{src/myRANSAC.m}
+\newpage
+
+\subsection*{q2\_1\_b.m}
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.3\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b1_AB_pair}
+      \caption{A and B.}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.3\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b1_BC_pair}
+      \caption{B and C.}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.3\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b1_CA_pair}
+      \caption{C and A.}
+    \end{subfigure}
+
+	\caption{HG Matching Pairs with Manual Points.}
+\end{figure}
+
+\lstinputlisting[style=Matlab-editor]{src/q2_1_b2.m}
+\newpage
+
+\subsection*{q2\_1\_b5.m (SURF Features)}
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.3\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b5_AB}
+      \caption{A and B.}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.3\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b5_BC}
+      \caption{B and C.}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.3\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b5_CA}
+      \caption{C and A.}
+    \end{subfigure}
+
+	\caption{HG Matching Pairs with SURF.}
+\end{figure}
+
+\lstinputlisting[style=Matlab-editor]{src/q2_1_b5.m}
+\newpage
+
+\subsection*{q2\_1\_c.m}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{pic/q2_1_c}
+  \caption{Graphs of HA against number of corresponding points}
+\end{figure}
+
+\lstinputlisting[style=Matlab-editor]{src/q2_1_c.m}
+\newpage
+
+\subsection*{q2\_2\_ab.m}
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{pic/q2_2_ab_A_0}
+      \caption{Image A  vs. Image B.}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{pic/q2_2_ab_B_0}
+        \caption{Image B  vs. Image A.}
+    \end{subfigure}
+
+	\caption{Epipoles and epipolar lines.}
+\end{figure}
+
+\lstinputlisting[style=Matlab-editor]{src/q2_2_ab.m}
+\newpage
+
+\subsection*{q2\_2\_cd4.m}
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{pic/q2_2_c1_dis}
+      \caption{Disparity: Image 1  vs. Image 5, Epipolar Lines.}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{pic/q2_2_c2_dis}
+        \caption{Disparity: Image 1  vs. Image 5, Horizontal Lines.}
+    \end{subfigure}
+    \\
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{pic/q2_2_c1_depth}
+      \caption{Depth: Image 1  vs. Image 5, Epipolar Lines.}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{pic/q2_2_c2_depth}
+        \caption{Depth: Image 1  vs. Image 5, Horizontal Lines.}
+    \end{subfigure}
+
+	\caption{Disparity and Depth.}
+\end{figure}
+
+\lstinputlisting[style=Matlab-editor]{src/q2_2_cd4.m}
 \newpage
 
 

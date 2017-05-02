@@ -130,13 +130,13 @@ fig = gcf;
 fig.PaperPositionMode = 'auto';
 print([outputpath, 'pic/q2_2_c1_dis'],'-dpng','-r0');
 
-% Depth
+%% Depth
 figure;
-depth = 1 ./ disparityX;
+depth = 1 ./ abs(disparityX);
 depth = depth * 20e-2 * 24e-3;
 depth(depth == Inf | depth == -Inf) = 0;
 depth = imresize(depth, winSize, 'Method', 'box');
-imshow(depth, [-4e-4, 1e-4]);
+imshow(depth, [0, 2.5e-4]);
 colormap jet;
 colorbar;
 fig = gcf;

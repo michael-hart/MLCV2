@@ -164,7 +164,7 @@ Feature detection is crucial in finding corresponding points for transformation 
 
 \subsubsection{Point and Patch Description}
 % Discuss need for description & our implementation
-Once features have been detected in the image, each point is taken as the centre of a 32x32 patch. To allow patches at the border, the image is padded by replicating the border pixels outwards (\texttt{describe2.m}). The patch is then converted into a 64-bin histogram for comparison. This bin number was varied, and experimentally determined to be the most suitable for matching.
+Once features have been detected in the image, each point is taken as the centre of a 32x32 patch. To allow patches at the border, the image is padded by replicating the border pixels outwards (\texttt{describe.m}). The patch is then converted into a 64-bin histogram for comparison. This bin number was varied, and experimentally determined to be the most suitable for matching.
 
 \subsubsection{Patch Matching}
 % Discuss patch matching implementation - could really do with a side-by-side with lines connecting matched patches
@@ -223,7 +223,7 @@ Another matrix is the fundamental matrix, which can be estimated using a series 
 % Discuss epipole lines and show example
 \subsubsection{Epipoles and Epipolar Lines}
 
-The fundamental matrix means the epipole of Image A, $\textbf{e}_\textbf{A}$, can be calculated through the relationship $\textbf{Fe}_\textbf{A} = 0$. This is the intersection of every epipolar line, which means the epipolar line of each point in Image A can be found. However, more useful is the corresponding epipolar line in Image B, as that is where the corresponding point will be found. In other words, for $\textbf{x}_\textbf{A}$, $\textbf{x}_\textbf{B}$ is found on the line $\textbf{L}_\textbf{B}=\textbf{Fx}_\textbf{A}$ \cite{mit}. An example is shown in Figure \ref{fig:epipolar}. The corresponding points were manually obtained, before the fundamental matrix, epipoles, and epipolar lines were found (\texttt{epiPolesLines.m}). 
+The fundamental matrix means the epipole of Image A, $\textbf{e}_\textbf{A}$, can be calculated through the relationship $\textbf{Fe}_\textbf{A} = 0$. This is the intersection of every epipolar line, which means the epipolar line of each point in Image A can be found. However, more useful is the corresponding epipolar line in Image B, as that is where the corresponding point will be found. In other words, for $\textbf{x}_\textbf{A}$, $\textbf{x}_\textbf{B}$ is found on the line $\textbf{L}_\textbf{B}=\textbf{Fx}_\textbf{A}$ \cite{mit}. An example is shown in Figure \ref{fig:epipolar}. The corresponding points were manually obtained, before the fundamental matrix, epipoles, and epipolar lines were found (\texttt{epiPolesLines.m}).
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -497,8 +497,8 @@ The depth map was calculated again, with $f = 22\text{mm}$, then with $f = 26\te
 \lstinputlisting[style=Matlab-editor]{src/harris.m}
 \newpage
 
-\subsection*{describe2.m}
-\lstinputlisting[style=Matlab-editor]{src/describe2.m}
+\subsection*{describe.m}
+\lstinputlisting[style=Matlab-editor]{src/describe.m}
 \newpage
 
 \subsection*{matchPatches.m}

@@ -420,73 +420,60 @@ As such, for FD1 and FD2, only horizontal lines were searched, as the camera was
     \end{subfigure}
     ~
     \begin{subfigure}{0.45\linewidth}
-      \includegraphics[width=\textwidth]{pic/q2_2_cd3_dis}
+      \includegraphics[width=\textwidth]{pic/q2_2_cd2_dis}
       \caption{Horizontal lines.}
       \label{fig:q2_2_cd3_tkb}
     \end{subfigure}
 
 	\caption{Comparison of disparity calculation along epipolar lines and along horizontal lines for Tsukuba data. }
-  \label{fig:matchBC}
+  \label{fig:q2_2_cd_tkb}
 \end{figure}
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=\textwidth]{pic/q2_2_cd4_dis}
-	\caption{Disparity map for FD1 using FD2, with 10x10 window size. Using horizontal lines.}
+  \includegraphics[width=\linewidth]{pic/q2_2_cd4_dis}
+  \caption{Disparity map for FD1 using FD2, with 10x10 window size. Using horizontal lines.}
   \label{fig:depth10}
 \end{figure}
 
 \subsubsection{Depth}
-To convert from disparity to depth ($z$), the formula $z = \frac{fb}{d}$, where $f$ is the focal length, $b$ is the baseline, and $d$ is the disparity. The absolute value of the disparity was taken as there cannot be negative distance in this case.
+To convert from disparity to depth ($z$), the formula $z = \frac{fb}{d}$, where $f$ is the focal length, $b$ is the baseline, and $d$ is the disparity. The absolute value of the disparity was taken as there cannot be negative distance in this case. Figure \ref{fig:depth} shows this. The window size was chosen because any larger, and the blockiness of the image made it impossible to conclude anything useful. The results are as expected, with the red portions (a higher depth) being mostly in the centre, around the window and the far side of the kitchen. The left and right parts of the image should be closer, and there is more blue, but there are outliers, like a large patch of red on the left, and light green as well. The fridge is surprisingly blue. It seems that the areas of white wall in the original image might be responsible. Upon closer inspection, the picture does have a lot of uniform white areas, which may have caused issues with feature recognition in earlier segments as well. However, this is again the result of the image, rather than the method, as evidenced by the success of the identical code with the Tsukuba data. 
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=\textwidth]{pic/q2_2_cd4_dis}
+  \includegraphics[width=\linewidth]{pic/q2_2_cd4_depth}
 	\caption{Depth map for FD1 using FD2, with 10x10 window size. $f = 24\text{mm}$, $b = 20\text{cm}$.}
-  \label{fig:depth10}
+  \label{fig:depth}
 \end{figure}
 
 \subsubsection{Focal Length and Noise}
 
-Following the calculation of epipoles and epipolar lines, the same pair of images were used to calculate both a disparity map and depth map. These are displayed in Figure \ref{fig:depth10}. The depth maps were both then calculated again, first by changing the focal length by 2mm to investigate the effect of change in depth, and by adding Gaussian noise to investigate the effect of noise on the maps. These results are shown in Figure \ref{fig:depthChanges}.
-
-% TODO discuss results from the generated images
-% TODO discuss the difference between epipolar and stereoscopic images
-% Meng, do you want to handle this as well?
-
+The depth map was calculated again, with $f = 22\text{mm}$, then with $f = 26\text{mm}$ and finally with $f = 24\text{mm}$ again, but adding Gaussian noise to the disparity map. Increasing the focal length should make everything further away, and reducing it vice-versa. This is visible as a slight shift to red in Figure \ref{fig:q2_2_e_focal1}, and more blue in Figure \ref{fig:q2_2_e_focal2}. Adding noise shown in Figure \ref{fig:q2_2_e_gaussian} appears to have no effect, whether at small or large amounts, as it either has no visible effort, or simply makes the depth map filled with artefacts. .
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
   \centering
     \begin{subfigure}{0.45\linewidth}
-      \includegraphics[width=\textwidth]{pic/q2_2_cd3_dis}
-      \caption{Disparity map}
+      \includegraphics[width=\textwidth]{pic/q2_2_e_focal1}
+      \caption{$f = 26\text{mm}$}
+      \label{fig:q2_2_e_focal1}
     \end{subfigure}
     ~
     \begin{subfigure}{0.45\linewidth}
-      \includegraphics[width=\textwidth]{pic/q2_2_cd3_depth10}
-      \caption{Depth map}
+      \includegraphics[width=\textwidth]{pic/q2_2_e_focal2}
+      \caption{$f = 22\text{mm}$}
+      \label{fig:q2_2_e_focal2}
     \end{subfigure}
 
-	\caption{Depth and Disparity maps from FD1 and FD2 images using 10x10 window size and depth predicted by epipolar lines}
-  \label{fig:depth10}
+    \caption{Depth map for FD1 using FD2, with 10x10 window size. $f = 24\text{mm}$, $b = 20\text{cm}$.}
+  \label{fig:q2_2_e_focal}
 \end{figure}
 
 \begin{figure}[!ht]
-  \captionsetup[subfigure]{position=b}
   \centering
-    \begin{subfigure}{0.45\linewidth}
-      \includegraphics[width=\textwidth]{pic/q2_2_e_focal2}
-      \caption{Depth map with 2mm increase in focal length}
-    \end{subfigure}
-    ~
-    \begin{subfigure}{0.45\linewidth}
-      \includegraphics[width=\textwidth]{pic/q2_2_e_gaussian}
-      \caption{Depth map with image and added Gaussian noise}
-    \end{subfigure}
-
-  \caption{Depth maps generated using 10x10 window size, depth predicted by epipolar lines, and changes to calculation method}
-  \label{fig:depthChanges}
+  \includegraphics[width=\linewidth]{pic/q2_2_e_gaussian}
+	\caption{Depth map for FD1 using FD2, with $\sigma = 16$, capped at $\pm 50$.}
+  \label{fig:q2_2_e_gaussian}
 \end{figure}
 
 

@@ -56,8 +56,7 @@ print([outputpath, 'pic/q2_2_e_focal2'],'-dpng','-r0');
 
 %% Depth, Gaussian noise added to Disparity. Zero Mean,
 % No more than 2 pixels... since most lies within 3 std of mean...
-% Standard deviation should be 2/3, let's say 0.5
-% Since Z = (X - mu)/sigma, then X = sigma * Z. (mu = 0)
+% Standard deviation should be 2/3. Cap at max 2 for values. 
 
 figure;
 
@@ -65,7 +64,11 @@ baseline = 20e-2;
 focallength = 24e-3;
 
 % Add noise
-disparityXNoise = disparityX + randn(size(disparityX)) * 15;
+themax = 50;
+noise = randn(size(disparityX)) * (themax/3);
+noise(noise > themax) = themax;
+noise(noise < -themax) = -themax;
+disparityXNoise = disparityX + noise;
 
 %
 close all;

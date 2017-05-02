@@ -217,9 +217,7 @@ Another matrix is the fundamental matrix, which can be estimated using a series 
 
 % Discuss epipole lines and show example
 \subsubsection{Epipoles and Epipolar Lines}
-The fundamental matrix means the epipole of Image A, $\textbf{e}_\textbf{A}$, can be calculated through the relationship $\textbf{Fe}_\textbf{A} = 0$. This is the intersection of every epipolar line, which means the epipolar line of each point in Image A can be found. However, more useful is the corresponding epipolar line in Image B, as that is where the corresponding point will be found. In other words, for $\textbf{x}_\textbf{A}$, $\textbf{x}_\textbf{B}$ is found on the line $\textbf{L}_\textbf{B}=\textbf{Fx}_\textbf{A}$ \cite{mit}.
-
-As an example, images from the Tsukuba image set \cite{tsukuba} have been used, shown in Figure \ref{fig:epipolar}. The corresponding points were manually obtained, before the fundamental matrix, epipoles, and epipolar lines were found. The function used to generate the epipole of an image and the epipolar lines of each point in both images is given in the Appendix as file \texttt{epiPolesLines.m}.
+The fundamental matrix means the epipole of Image A, $\textbf{e}_\textbf{A}$, can be calculated through the relationship $\textbf{Fe}_\textbf{A} = 0$. This is the intersection of every epipolar line, which means the epipolar line of each point in Image A can be found. However, more useful is the corresponding epipolar line in Image B, as that is where the corresponding point will be found. In other words, for $\textbf{x}_\textbf{A}$, $\textbf{x}_\textbf{B}$ is found on the line $\textbf{L}_\textbf{B}=\textbf{Fx}_\textbf{A}$ \cite{mit}. As an example, images from the Tsukuba image set \cite{tsukuba} have been used, shown in Figure \ref{fig:epipolar}. The corresponding points were manually obtained, before the fundamental matrix, epipoles, and epipolar lines were found. The function used to generate the epipole of an image and the epipolar lines of each point in both images is given in the Appendix as file \texttt{epiPolesLines.m}.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -257,11 +255,7 @@ The image HG1 was used for this test, with the Harris detector and a threshold o
 
 \subsubsection{Manual vs. Automatic}
 % Harris 4K points for 500 threshold
-To evaluate automatic point detection, user-selected and automatic point selection were both used to determine the homography matrices between HG1 (A), HG2 (B), and HG3 (C). The homography from A to B, from B to C, and from C to B was first done manually. All worked as expected. Pair BC is in Figure \ref{fig:manHomog}. The success shows the effectiveness of the algorithms used.
-
-However, when the automatic detection system was used, the homography matrices were wrong. This was due to the presence of outliers. The method used to remove them is known as RANdom SAmple Consensus, or RANSAC \cite{ransac}. The implementation can be found in \texttt{myRANSAC.m} in the Appendix.
-
-This was run on the matching pairs before the homography estimates were done. To test this, the boat data was used again, as seen in Figure \ref{fig:boatmatches}, which shows some of the results of the automatic detection with RANSAC. The success shows the validity of our methods and functions.
+To evaluate automatic point detection, user-selected and automatic point selection were both used to determine the homography matrices between HG1 (A), HG2 (B), and HG3 (C). The homography from A to B, from B to C, and from C to B was first done manually. All worked as expected. Pair BC is in Figure \ref{fig:manHomog}. The success shows the effectiveness of the algorithms used. However, when the automatic detection system was used, the homography matrices were wrong. This was due to the presence of outliers. The method used to remove them is known as RANdom SAmple Consensus, or RANSAC \cite{ransac}. The implementation can be found in \texttt{myRANSAC.m} in the Appendix. This was run on the matching pairs before the homography estimates were done. To test this, the boat data was used again, as seen in Figure \ref{fig:boatmatches}, which shows some of the results of the automatic detection with RANSAC. The success shows the validity of our methods and functions.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -384,18 +378,14 @@ This section uses the FD set of images, with FD1, FD2, and FD3 being 0cm, 20cm, 
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=\linewidth]{pic/q2_2_ab_A_0}
+  \includegraphics[width=0.75\linewidth]{pic/q2_2_ab_A_0}
   \caption{Epipoles and epipolar lines between images FD1 and FD2}
   \vspace{-0.5cm}
   \label{fig:fdEpipoles}
 \end{figure}
 
 \subsubsection{Disparity}
-To calculate disparity, the method of Sum Squared Differences (SSD) was used. FD1 (A) is split into windows, and the most similar window in searched for in FD2 (B). The difference in $x$ values of the centers of the window in A and the matching window in B is the disparity. To reduce the amount of searching, the points selected in B for comparison are limited to those on the epipolar line in B corresponding to the centre of the window in A.
-
-However, if the pictures are coplanar, the method may not be as effective as the search should happen along the horizontal line, even if the calculated epipolar lines are not parallel. To test this, the Tsukuba data was used again, shown in Figure \ref{fig:q2_2_cd_tkb}. It shows that if the pictures are coplanar, even if the calculated epipolar lines are not parallel, using parallel horizontal lines yields better results.
-
-As such, for A and B, only horizontal lines were searched, as the camera was only moved horizontally. The disparity map is shown in \ref{fig:depth10}.  However, the Tsukuba example shows proof that an epipolar line search method was written and would work for other non-coplanar pictures.
+To calculate disparity, the method of Sum Squared Differences (SSD) was used. FD1 (A) is split into windows, and the most similar window in searched for in FD2 (B). The difference in $x$ values of the centers of the window in A and the matching window in B is the disparity. To reduce the amount of searching, the points selected in B for comparison are limited to those on the epipolar line in B corresponding to the centre of the window in A. However, if the pictures are coplanar, the method may not be as effective as the search should happen along the horizontal line, even if the calculated epipolar lines are not parallel. To test this, the Tsukuba data was used again, shown in Figure \ref{fig:q2_2_cd_tkb}. It shows that if the pictures are coplanar, even if the calculated epipolar lines are not parallel, using parallel horizontal lines yields better results. As such, for A and B, only horizontal lines were searched, as the camera was only moved horizontally. The disparity map is shown in \ref{fig:depth10}.  However, the Tsukuba example shows proof that an epipolar line search method was written and would work for other non-coplanar pictures.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}

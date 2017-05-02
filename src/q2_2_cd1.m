@@ -73,7 +73,7 @@ for winRow = 1:winRows
         LineB = [1:xBSpan; m * (1:xBSpan) + b];
         
         % Remove unneccessary points (y < 0, y > max), then round.
-        LineB = LineB(:, ((LineB(2, :) + winSize - 1) > 0) & ((LineB(2, :) + winSize - 1) < yBSpan));
+        LineB = LineB(:, (LineB(2, :) > 0) & (LineB(2, :) < yBSpan));
         LineB = round(LineB);
         M = size(LineB, 2);
         

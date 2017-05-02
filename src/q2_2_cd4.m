@@ -124,11 +124,11 @@ print([outputpath, 'pic/q2_2_c4_dis'],'-dpng','-r0');
 
 %% Depth
 figure;
-depth = 1 ./ disparityX;
+depth = 1 ./ abs(disparityX);
 depth = depth * 20e-2 * 24e-3;
 depth(depth == Inf | depth == -Inf) = 0;
 depth = imresize(depth, winSize, 'Method', 'box');
-imshow(depth, [-3e-4, 2e-4]);
+imshow(depth, [0, 1.5e-4]);
 colormap jet;
 colorbar;
 fig = gcf;

@@ -12,7 +12,7 @@ end
 %% Generate data to use, normal image
 imgNormal = imread('HG1.pgm');
 
-% Perform Harris corner detection - 2500 works well from testing
+% Perform Harris corner detection
 harrisNormal = harris(imgNormal, 500);
 
 %% Display picture with points
@@ -42,7 +42,7 @@ fig.PaperPositionMode = 'auto';
 print([outputpath, 'pic/q2_1_a_imgReduced'],'-dpng','-r0');
 
 %% Display both sets of points together.
-% Normal image, with reduced points doubled to fit. 
+% Normal image, with reduced points doubled to fit.
 figure;
 imshow(imgNormal);
 hold on;
@@ -59,7 +59,7 @@ print([outputpath, 'pic/q2_1_a_imgBoth'],'-dpng','-r0');
 nMatch = size(matches, 2);
 total = 0;
 
-% Locate each pair, take distance. Sum. Then average. 
+% Locate each pair, take distance. Sum. Then average.
 for index= 1:nMatch
     n = matches(1, index);
     m = matches(2, index);

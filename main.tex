@@ -107,8 +107,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 % What are the methods discussed? Short explanations
 
 \section{Question 1 - Matching}
-
-\subsection{Manual Feature Selection}
+\subsection{Manual Point Matching}
 
 % Maybe a bit overkill considering our page limit, butt fuck it
 Although automatic feature selection is preferable for computer vision, a valuable tool for checking how the algorithms work is to allow a user to manually select interest points. Five pairs of points are selected by the user, which are then assumed to match, removing the need for automatic point selection and patch matching. The MATLAB code to do this is found in the Appendix as file \texttt{q1\_manual.m}. An example of two images with the selected data points is shown in Figure \ref{fig:manual}.
@@ -118,7 +117,7 @@ Although automatic feature selection is preferable for computer vision, a valuab
   \centering
     \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\textwidth]{pic/manualA}
-      \caption{Image A, original image}
+      \caption{Image A, original image, from the HG set}
       \label{fig:manualA}
     \end{subfigure}
     ~
@@ -132,13 +131,13 @@ Although automatic feature selection is preferable for computer vision, a valuab
   \label{fig:manual}
 \end{figure}
 
-\subsection{Automatic Feature Detection}
-
+\subsection{Automatic Point Matching }
+\subsubsection{Interest Point Detection}
 % Discuss need for interest point selection
 For many computer vision applications, detecting features within an image or the same features within multiple images is crucial. These features can take a number of shapes, such as edges or corners. Once the same detector is run on two images with some of the same features, such as overlapping features in a panorama, the features can be automatically matches and a transformation estimated between the images.
 
 % Discuss implemented selectors - TODO discuss the example images?
-Both Hessian and Harris selectors have been implemented for this application. Both differentiate the given image twice and compare the results to a threshold, where calculations with the results vary depending on the detector. From subjective use of each detector, the Harris algorithm was found to perform more effectively. Both algorithms are based on code written by Svetlana Lazebnik \cite{harrisdetector}, and may be found in the Appendix as files \texttt{hessian.m} and \texttt{harris.m}. Images showing interest points detected by the two detectors are shown in Figure \ref{fig:detectors}. These images show an unexpected result in that many of the detected features seem to be part of uniform patches of image; this may suggest an insufficiently large threshold.
+Both Hessian and Harris selectors have been implemented for this application. Both differentiate the given image twice and compare the results to a threshold, where calculations with the results vary depending on the detector. From subjective use of each detector, the Harris algorithm was found to perform more effectively. Both algorithms are based on code written by Svetlana Lazebnik \cite{harrisdetector}, and may be found in the Appendix as files \texttt{hessian.m} and \texttt{harris.m}. Images showing interest points detected by the two detectors are shown in Figure \ref{fig:detectors}. These images show an unexpected result in that many of the detected features seem to be part of uniform patches of image; this may suggest an insufficiently large threshold. The threshold was adjusted in future sections to yield the most suitable number of points.
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -159,13 +158,15 @@ Both Hessian and Harris selectors have been implemented for this application. Bo
   \label{fig:detectors}
 \end{figure}
 
+\subsubsection{Point and Patch Description}
 % Discuss need for description & our implementation
-Once features have been detected in the image, these points must have some description to allow comparison with other points. At first, each interest point was used at the top left corner of a fixed-size patch, limiting the point so as not to cross the border. However, this removed some information due to the border limiting and the patch position missing out on rotation information if matching between images; therefore, the interest point is the centre of a patch in a padded image, and the descriptor of that patch is a simple histogram. The padded image is found by replicating the border pixels outwards. This may be found in the Appendix as \texttt{describe.m}.
+Once features have been detected in the image, these points must have some description to allow comparison with other points. At first, each interest point was used at the top left corner of a fixed-size (32 by 32) patch, limiting the point so as not to cross the border. However, this removed some information due to the border limiting and the patch position missing out on rotation information if matching between images; therefore, the interest point is the centre of a patch in a padded image The padded image is found by replicating the border pixels outwards. This may be found in the Appendix as \texttt{describe2.m}. The patch is then converted into a 64 bin histogram for comparison. This value was varied, and experimentally determined to be the most suitable for matching.
 
+\subsubsection{Patch Matching}
 % Discuss patch matching implementation - could really do with a side-by-side with lines connecting matched patches
-Once each interest point has a corresponding descriptor, the points from two different images can be compared. The simplest method for comparing these descriptors is to use nearest neighbour (NN) matching, which interprets the difference in histograms as an error, and matches the points with the least error. Furthermore, the interest points from each image are considered in turn, and only if a pair of patches are both nearest neighbours to each other are they considered to match. The algorithm for this is shown in  the Appendix as \texttt{matchPatches.m}. 
+Once each interest point has a corresponding descriptor, the points from two different images can be compared. The simplest method for comparing these descriptors is to use nearest neighbour (NN) matching, which interprets the difference in histograms as an error, and matches the points with the least error. Furthermore, the interest points from each image are considered in turn, and only if a pair of patches are both nearest neighbours to each other are they considered to match. The algorithm for this is shown in  the Appendix as \texttt{matchPatches.m}.
 
-An example image of two images with matching points is shown in Figure \ref{fig:matched}. The images used are the same as in Figure \ref{fig:manual}, but the threshold of 3000 with the Harris detector were used, which would indicate a similar number of feature points as in Figure \ref{fig:harris3000}. After NN matching, the number of points has been vastly reduced and mostly correspond, with a couple of exceptions, such as the green line between the coffee pot and the coffee machine pod. These points are not the same, but the surrounding area is very similar, which causes the error.
+An example image of two images with matching points is shown in Figure \ref{fig:matched}. The images used are the same as in Figure \ref{fig:manual}, but the threshold of 3000 with the Harris detector were used, which would indicate a similar number of feature points as in Figure \ref{fig:harris3000}. After NN matching, the number of points has been vastly reduced and mostly correspond, with a couple of exceptions, such as the green line between the coffee pot and the coffee machine pod. These points are not the same, but the surrounding area is very similar, which causes the error. Those are the source of the outliers.
 
 % I did also create this figure with showMatchedFeatures, but I found it really hard to spot where the differences are, so I did it like this. I can upload the matchedFeatures version if you want, just ask
 \begin{figure}[!ht]
@@ -186,77 +187,76 @@ An example image of two images with matching points is shown in Figure \ref{fig:
 \subsection{Transformation Estimation}
 
 % Need to discuss homography matrix estimation and show example
-
-The matching pairs of points can be used to estimate the transformation matrix between the two images, known as the homography matrix. The homography matrix is \textbf{H}, and must satisfy Equation \ref{eqn:homography}, where \textbf{x} is the original point and $\textbf{x}'$ is the destination point after the transformation. The method for this is discussed in the course notes \cite{notes}; as such, examples of transformations will be shown, with the full details of implementation given in the source code in the Appendix, file \texttt{estTransformMat.m}.
+\subsubsection{Homography Matrix}
+The matching pairs of points can be used to estimate the transformation matrix between the two images, known as the homography matrix. The homography matrix is \textbf{H}, and must satisfy Equation \ref{eqn:homography}, where $\textbf{x}_\textbf{A}$ is the original point and $\textbf{x}_\textbf{B}$ is the destination point after the transformation. The method for this is discussed in the course notes and during the lectures\cite{notes}; as such, the formulas will not be repeated, with the full details of implementation given in the source code in the Appendix, file \texttt{estTransformMat.m}.
 
 \begin{equation} \label{eqn:homography}
-\textbf{x}' = \textbf{Hx}
+    \textbf{x}_\textbf{B} = \textbf{Hx}_\textbf{A}
 \end{equation}
 
-An example of an estimated homography matrix is given in Equation \ref{eqn:homographyEstimated}, where the images used in Figure \ref{fig:manual} were again used to estimate a transformation. The result of transforming Image A to fit Image B is shown in Figure \ref{fig:homography}, which used manually selected user points as corresponding co-ordinates and estimated an accurate homography matrix. The matrix is considered accurate as the two images overlap to form grayscale in the centre. There is a slight error, shown by blurring around sharp edges where the green and purple do not match correctly.
-
-\begin{equation} \label{eqn:homographyEstimated}
-\textbf{H} = \begin{bmatrix}
-    1.3964 & 0.5742 & -455.55 \\
-    -0.5984 & 1.3651 & 190.96 \\
-    0.0000 & -0.0000 & 1.0000
-\end{bmatrix}
-\end{equation}
+%% Move from here.
+\subsubsection{Homography Tranformation}
+A routine was written to take the points in Image A, and project them onto the same axes as Image B. The difficulty was setting the new points to fit within MATLAB's array indexing. To compensate for this, the function also creates a reference object that MATLAB uses to map values to the negative axes while keeping the indices valid. Figure \ref{fig:boat13} shows the result of manually selecting points on the boat example images \cite{boat}, estimating the homography, and projecting the points through the homography matrix. While the projection method and estimation method both work well, there is slight error, shown by the green and purple parts where the images do not overlap. The function can be found in \texttt{projection.m} (Note: While the projection method was written, the simultaneous display function was done with MATLAB, as that was not part of this assignment.)
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=\linewidth]{pic/homographyExample}
-  \caption{Image A (purple) transformed and overlaid on Image B (green)}
-  \label{fig:homography}
+  \includegraphics[width=0.9\linewidth]{pic/q2_1_b4_1_3_pair}
+  \caption{Image A (Boat 1) transformed and overlaid on Image B (Boat 3)}
+  \label{fig:boat13}
 \end{figure}
+%% Move end here.
 
 % Discuss errorHA method
-To estimate how well a homography matrix matches the two sets of points together, a metric called the Homography Accuracy (HA) is used. This HA is calculated by taking the corresponding sets of points and transforming one set to fit the other using the given homography matrix. The error between the predicted and actual points is interpreted as the distance; the mean distance is the HA. The HA for the example shown in \ref{fig:homography} is $HA=0.0536$.
+\subsubsection{Homography Accuracy Calculation}
+To estimate how well a homography matrix matches the two sets of points together, a metric called the Homography Accuracy (HA) is used. This HA is calculated by taking the corresponding sets of points and transforming one set to fit the other using the given homography matrix. The error between the predicted and actual points is interpreted as the distance; the mean distance is the HA. The HA for the example shown in Figure \ref{fig:boat13} is $HA=4.9149$, which is quite small. The code is in the Appendix as file \texttt{errorHA.m}.
 
 % Need to discuss fundamental matrix estimation (and show example?)
+\subsubsection{Fundamental Matrix}
 Another matrix used in computer vision is the fundamental matrix, which can be estimated using a series of corresponding points. This matrix can be used to constrain the possible locations of points in a second image from points in the first image given the fundamental matrix between the two images. The method itself is very similar to the homography matrix, except that the relation in Equation \ref{eqn:fundamental} is used instead of that in Equation \ref{eqn:homography}. The code for implementation is given in the Appendix as file \texttt{estFundamentalMat.m}.
 
 \begin{equation} \label{eqn:fundamental}
-\textbf{x}'^T\textbf{Fx} = 0
+    \textbf{x}_\textbf{B}^T\textbf{Fx}_\textbf{A} = 0
 \end{equation}
 
 % Discuss epipole lines and show example
-The fundamental matrix can be used to constrain the search space from points in one image to the same scene points in the second image by giving the equation of a line $\textbf{l}=\textbf{Fx}$, such that the correct point on the line \textbf{l} satisfies Equation \ref{eqn:fundamental}. This is known as the epipolar line. To demonstrate example epipoles and epipolar lines, images from the Tsukuba image set \cite{tsukuba} have been used. The images have user-selected matching points which are used to estimate a fundamental matrix, given in Equation \ref{eqn:fundamentalEstimated}. This matrix \textbf{F} is then used to generate epipolar lines, shown in Figure \ref{fig:epipolar}. The function used to generate the epipolar lines is given in the Appendix as file \texttt{epiPolesLines.m}.
+\subsubsection{Epipoles and Epipolar Lines}
+The fundamental matrix means the epipole of Image A, $\textbf{e}_\textbf{A}$, can be calculated through the relationship $\textbf{Fx}_\textbf{A} = 0$. This is the intersection of every epipolar line, which means the epipolar line of each point in Image A can be found. However, more useful is the corresponding epipolar line in Image B, as that is where the corresponding point will be found. In other words, for $\textbf{x}_\textbf{A}$, $\textbf{x}_\textbf{B}$ is found on the line $\textbf{l}_\textbf{B}=\textbf{Fx}_\textbf{A}$ \cite{mit}.
 
-\begin{equation} \label{eqn:fundamentalEstimated}
-\textbf{F} = \begin{bmatrix}
-     0.0001 &  0.0005 &  0.0494 \\
-    -0.0007 & -0.0000 & -0.6736 \\
-    -0.0849 &  0.7735 &  1.0000
-\end{bmatrix}
-\end{equation}
+As an example, images from the Tsukuba image set \cite{tsukuba} have been used, shown in Figure \ref{fig:epipolar}. The corresponding points were manually obtained, before the fundamental matrix, epipoles, and epipolar lines were found. The function used to generate the epipole of an image and the epipolar lines of each point in both images is given in the Appendix as file \texttt{epiPolesLines.m}.
+
+%% Not sure if needed.
+% \begin{equation} \label{eqn:fundamentalEstimated}
+% \textbf{F} = \begin{bmatrix}
+%      0.0001 &  0.0005 &  0.0494 \\
+%     -0.0007 & -0.0000 & -0.6736 \\
+%     -0.0849 &  0.7735 &  1.0000
+% \end{bmatrix}
+% \end{equation}
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
   \centering
     \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\textwidth]{pic/q1_3_d_A}
-      \caption{Tsukuba image A with epipoles and epipolar lines from B}
+      \caption{Tsukuba 1 as Image A  with epipole and epipolar lines.}
       \label{fig:tsuka}
     \end{subfigure}
     ~
     \begin{subfigure}{0.45\linewidth}
       \includegraphics[width=\textwidth]{pic/q1_3_d_B}
-      \caption{Tsukuba image B with epipoles and epipolar lines from A}
+      \caption{Tsukuba 5 as Image B with epipoles and epipolar lines.}
       \label{fig:tsukb}
     \end{subfigure}
 
-	\caption{Epipoles and estimated epipolar lines}
+	\caption{Epipoles and epipolar lines.}
   \label{fig:epipolar}
 \end{figure}
 
 
 \section{Question - Image Geometry}
-
-The kitchen images used thus far in this paper have been taken by the authors; as such, parameters of the images are known. The FD set has a 20cm displacement between each of the three images, with all other parameters the same, and a focal length of 24mm. The HG set is taken without displacing the camera; the first image is level with 24mm focal length; the second is tilted by 20\degree, taken with 36mm focal length; the third image is tilted by $40\degree$ with 56mm focal length.
+The kitchen images used thus far in this paper have been taken by the authors; as such, parameters of the images are known. The FD set has a 20cm displacement between each of the three images, with all other parameters the same, and a focal length of 24mm. The HG set is taken without displacing the camera; the first image is level with 24mm focal length; the second is tilted by $20\degree$, taken with 36mm focal length; the third image is tilted by $40\degree$ with 56mm focal length.
 
 \subsection{Homography with HG Pictures}
-
 \subsubsection{Reduced Size}
 The image HG1 was used for this test, with the Harris detector and a threshold of 500 used to detect interest points. The image was then scaled down to half its original size in both width and height, and the same Harris detector run on the result. The two sets of resulting points were matched as previously described. The average distance between the matched points, or HA error, was calculated as 0.5995. Therefore, although there are far more interest points detected with the larger resolution image, the points that are matched between the two images are very close to each other. The points can be seen in Figure \ref{fig:reducedcompare}.
 
@@ -269,13 +269,55 @@ The image HG1 was used for this test, with the Harris detector and a threshold o
 
 \subsubsection{Manual vs. Automatic}
 % Harris 4K points for 500 threshold
-To determine the success of automatic point detection, user-selected and automatic point selection were both used to determine the homography matrices between HG1, HG2, and HG3. These images are referred to as images A, B, and C, respectively. The homography matrix from A to B, from B to C, and from C to B were all estimated using user-selected points; automatically selected points from the Harris detector; and MATLAB implementations for the Harris detector and SURF algorithm.
+To determine the success of automatic point detection, user-selected and automatic point selection were both used to determine the homography matrices between HG1, HG2, and HG3. These images are referred to as images A, B, and C, respectively. The homography from A to B, from B to C, and from C to B was first done manually. All worked as expected. Pair BC is in Figure \ref{fig:manHomog}. The success shows the effectiveness of the algorithms used.
+
+However, when the automatic detection system was used, the homography matrices were completely wrong. This was no doubt due to the presence of outliers. To deal with this, a number of methods were used. The one that worked is known as RANdom SAmple Consensus, or RANSAC \cite{ransac}. This method of removing outliers works through the following steps. The implementation can be found in \texttt{myRANSAC.m} in the Appendix.
+\begin{enumerate}
+    \item Randomly select minimum number of points from data set to form the model. In this case, 4.
+    \item Calculate model. Measure deviation from model of each point in data set.
+    \item Find the subset that lies within a specified margin of the model. Measure the size of that subset.
+    \item Repeat 1. and 2. as many times as desired.
+    \item Keep the largest subset from all the iterations. These are the inliers.
+\end{enumerate}
+This was run on all the matching pairs before the homography estimates were done. To test this, the boat data was used again, as seen in Figure \ref{fig:boatmatches}, which shows some of the results of the automatic detection with RANSAC. The success shows the validity of our methods and functions.
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.3\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b4_1_2_pair}
+      \caption{1 and 2.}
+      \label{fig:boatmatch12}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.3\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_1_b4_1_3_pair}
+      \caption{1 and 3.}
+      \label{fig:boatmatch13}
+  \end{subfigure}
+  \\
+  \begin{subfigure}{0.3\linewidth}
+    \includegraphics[width=\textwidth]{pic/q2_1_b4_2_3_pair}
+    \caption{2 and 3.}
+    \label{fig:boatmatch23}
+  \end{subfigure}
+  ~
+  \begin{subfigure}{0.3\linewidth}
+    \includegraphics[width=\textwidth]{pic/q2_1_b4_3_4_pair}
+    \caption{3 and 4.}
+    \label{fig:boatmatch34}
+\end{subfigure}
+	\caption{HG results for boat with RANSAC.}
+  \label{fig:boatmatches}
+\end{figure}
+
+However, when the same method was applied to our pictures, only the BC pair worked, in Figure \ref{fig:autoHomog}. As such, only the pair BC is further analysed. However, to make sure that it was not our algorithm, MATLAB's Harris detection, matching, and homography estimation methods were used as reference. Strangely enough, MATLAB was able to work out the AB pair, but neither the BC nor the CA pair! In contrast, the SURF methods of MATLAB were able to work out all 3 pairs. The written methods had a success rate of 33\%, on par with the MATLAB methods. Combining this observation with the success of with the boat photos suggests that the Harris detection was simply not suitable for the HG photos. The image results from the MATLAB Harris and SURF are found in the Appendix.
 
 % Need to show automatic vs. manual for a pair of pictures
 % Need to visualise those homographies
 % Need to analyse those homographies for translation/rotation/projection things
 
-For the automatic point selection, the most successful image pair was from image B to image C. The matrices $\textbf{H}_{man}$ and $\textbf{H}_{auto}$ represent the homography matrices estimated from user-selected points and Harris-detected points, respectively. These transformations are also visualised in Figure \ref{fig:matchBC}, which shows that $\textbf{H}_{man}$ is closer to the true matrix, as the edges and objects within the images line up more closely and there is less blur.
+The matrices $\textbf{H}_{man}$ and $\textbf{H}_{auto}$ represent the homography matrices estimated from user-selected points and Harris-detected points, respectively. These transformations are also visualised in Figure \ref{fig:matchBC}, which shows that $\textbf{H}_{man}$ is closer to the true matrix, as the edges and objects within the images line up more closely and there is less blur.
 
 % Select pair B->C as it is the only working pair
 
@@ -296,7 +338,6 @@ For the automatic point selection, the most successful image pair was from image
 \end{equation}
 
 These matrices can be analysed as similarity matrices, yielding a scale factor change, a rotation, and a translation. The x, y translation are given by $h_{13}$ and $h_{23}$ of each matrix respectively; there seems to be a significant difference between the two. As the scale and rotation are multiples, these are more complex to compute. As such, a script was used to compute the scale factor from the mean of the sine terms and the mean of the cosine terms, adjusting the angle until the two scale factors are very close. This computation shows that $\textbf{H}_{auto}$ has a rotation of 19.49\degree, and a scale factor of 1.885; $\textbf{H}_{man}$ has a rotation of 21.5\degree, and a scale factor of 1.67. As the camera was intended to be rotated by 20\degree, and scaled by factor 1.5, this latter matrix represents the transformation more accurately. Information on how the scale factor, rotation, and translation appear in the matrix can be found in the course notes \cite{notes}.
-
 
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
@@ -327,11 +368,8 @@ These matrices can be analysed as similarity matrices, yielding a scale factor c
 % Find the number of outliers
 % Explain how you found the outliers
 
-To test how the homography changes with different parameters of the full estimation algorithm, a number of tests were run which varied the threshold of the Harris detector for each image and the resolution of the histogram descriptor for each patch by specifying the number of bins.
-
 % TODO what was the result of these tests?
-
-The number of outliers for the entire algorithm was measured by varying the detector threshold to change the number of corresponding points, then the accuracy taken using the function found in \texttt{errorHA.m}. The result is shown in Figure \ref{fig:outliers}. The error decreases with number of points, being steady from around 80 corresponding points upwards. The error spikes heavily when there are few points, showing that using a few points can produce reasonable results but is not reliable.
+For the pair BC that worked, the original number of matches was 439. The number of points used was to 278. Thus, the number of outliers was 161. As mentioned above, RANSAC was used to remove the outliers. Thus, the number of inlier points was considered in this question. Of the 278 points, a certain number would be randomly selected to calculate the homography matrix, before the HA was calculated. That number varied from 4 to 278. The result is shown in Figure \ref{fig:outliers}. The error decreases with number of points, being steady from around 80 corresponding points upwards. The error spikes heavily when there are few points, showing that using a few points can produce reasonable results but is not reliable. In other words, the post-RANSAC selection of points still contains some outliers, but they are much rarer than before. However, once only a certain random subset of the post-RANSAC points are selected, there is a chance that a selection will contain more outliers that the homography estimation can cope with, thus causing spikes in errors. At small numbers, the chances of selecting only the valid points are higher, hence the lower error.
 
 % TODO anything else to say here?
 
@@ -343,19 +381,20 @@ The number of outliers for the entire algorithm was measured by varying the dete
 \end{figure}
 
 \subsection{Stereo Vision With FD Pictures}
+\subsubsection{Epipoles and Epipolar Lines}
 
 % Estimate fundamental matrix from manual points with FD pics
 % Calculate epipoles for A,B and show
 
-This section uses the FD set of images, with FD1, FD2, and FD3 being 0cm, 20cm, and 40cm displaced from the original image, respectively. For each pair FD1 and FD2, FD2 and FD3, FD3 and FD1, the fundamental matrix is estimated and the epipoles and epipolar lines calculated. The fundamental matrix of the first pair is given in Equation \ref{eqn:fundamentalFD}, estimated using user-selected correspondences. The epipolar lines and epipoles for the same pair are given in Figure \ref{fig:fdEpipoles}.
-
-\begin{equation} \label{eqn:fundamentalFD}
-\textbf{F} = \begin{bmatrix}
-     0.0000 & -0.0000 &  0.0234 \\
-     0.0000 &  0.0000 & -0.1198 \\
-    -0.0259 &  0.1235 &  1.0000
-\end{bmatrix}
-\end{equation}
+This section uses the FD set of images, with FD1, FD2, and FD3 being 0cm, 20cm, and 40cm displaced from the original image, respectively. For each pair FD1 and FD2, FD2 and FD3, FD3 and FD1, the fundamental matrix is estimated and the epipoles and epipolar lines calculated. The epipolar lines and epipoles for the same pair are given in Figure \ref{fig:fdEpipoles}. This is as expected. The horizontal lines suggest that the photos are almost coplanar, and this is reasonable as the camera was moved only horizontally for the FD images.
+%
+% \begin{equation} \label{eqn:fundamentalFD}
+% \textbf{F} = \begin{bmatrix}
+%      0.0000 & -0.0000 &  0.0234 \\
+%      0.0000 &  0.0000 & -0.1198 \\
+%     -0.0259 &  0.1235 &  1.0000
+% \end{bmatrix}
+% \end{equation}
 
 \begin{figure}[!ht]
   \centering
@@ -363,6 +402,51 @@ This section uses the FD set of images, with FD1, FD2, and FD3 being 0cm, 20cm, 
   \caption{Epipoles and epipolar lines between images FD1 and FD2}
   \label{fig:fdEpipoles}
 \end{figure}
+
+\subsubsection{Disparity}
+To calculate disparity, the method of Sum Squared Differences (SSD) was used. The Image A (FD1) into windows, and then searching for the most similar window in Image B. The difference in $x$ values of the centers of the window in A and the matching window in B is the disparity. To reduce the amount of searching, the points selected in Image B for comparison are limited to those on the epipolar line in B corresponding to the centre of the window in A.
+
+However, if the pictures are coplanar, the method may not be as effective as the search should happen along the horizontal line, even if the calculated epilines are not parallel. To test this, the Tsukuba data was used again, shown in Figure \ref{fig:q2_2_cd_tkb}. It shows that if the pictures are coplanar, even if the calculated epipolar lines are not parallel, using parallel horizontal lines yields better results.
+
+As such, for FD1 and FD2, only horizontal lines were searched, as the camera was only moved horizontally. The disparity map is shown in \ref{fig:depth10}.  However, the Tsukuba example shows proof that an epipolar line search method was written.
+
+\begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
+  \centering
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_2_cd1_dis}
+      \caption{Epipolar lines.}
+      \label{fig:q2_2_cd1_tkb}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+      \includegraphics[width=\textwidth]{pic/q2_2_cd3_dis}
+      \caption{Horizontal lines.}
+      \label{fig:q2_2_cd3_tkb}
+    \end{subfigure}
+
+	\caption{Comparison of disparity calculation along epipolar lines and along horizontal lines for Tsukuba data. }
+  \label{fig:matchBC}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\textwidth]{pic/q2_2_cd4_dis}
+	\caption{Disparity map for FD1 using FD2, with 10x10 window size. Using horizontal lines.}
+  \label{fig:depth10}
+\end{figure}
+
+\subsubsection{Depth}
+To convert from disparity to depth ($z$), the formula $z = \frac{fb}{d}$, where $f$ is the focal length, $b$ is the baseline, and $d$ is the disparity. The absolute value of the disparity was taken as there cannot be negative distance in this case.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\textwidth]{pic/q2_2_cd4_dis}
+	\caption{Depth map for FD1 using FD2, with 10x10 window size. $f = 24\text{mm}$, $b = 20\text{cm}$.}
+  \label{fig:depth10}
+\end{figure}
+
+\subsubsection{Focal Length and Noise}
 
 Following the calculation of epipoles and epipolar lines, the same pair of images were used to calculate both a disparity map and depth map. These are displayed in Figure \ref{fig:depth10}. The depth maps were both then calculated again, first by changing the focal length by 2mm to investigate the effect of change in depth, and by adding Gaussian noise to investigate the effect of noise on the maps. These results are shown in Figure \ref{fig:depthChanges}.
 
@@ -436,7 +520,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus gravida viver
 \lstinputlisting[style=Matlab-editor]{src/harris.m}
 \newpage
 
-\subsection*{describe.m}
+\subsection*{describe2.m}
 \lstinputlisting[style=Matlab-editor]{src/describe2.m}
 \newpage
 

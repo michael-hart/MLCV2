@@ -23,12 +23,12 @@ figure;
 baseline = 20e-2;
 focallength = 26e-3;
 
-depth = 1 ./ disparityX;
+depth = 1 ./ abs(disparityX);
 depth = depth * baseline * focallength;
 
 depth(depth == Inf | depth == -Inf) = 0;
 depth = imresize(depth, winSize, 'Method', 'box');
-imshow(depth, [-3e-4, 2e-4]);
+imshow(depth, [0, 1.5e-4]);
 colormap jet;
 colorbar;
 fig = gcf;
@@ -42,12 +42,12 @@ figure;
 baseline = 20e-2;
 focallength = 22e-3;
 
-depth = 1 ./ disparityX;
+depth = 1 ./ abs(disparityX);
 depth = depth * baseline * focallength;
 
 depth(depth == Inf | depth == -Inf) = 0;
 depth = imresize(depth, winSize, 'Method', 'box');
-imshow(depth, [-3e-4, 2e-4]);
+imshow(depth, [0, 1.5e-4]);
 colormap jet;
 colorbar;
 fig = gcf;
@@ -69,12 +69,12 @@ disparityXNoise = disparityX + randn(size(disparityX)) * 15;
 
 %
 close all;
-depth = 1 ./ disparityXNoise;
+depth = 1 ./ abs(disparityXNoise);
 depth = depth * baseline * focallength;
 
 depth(depth == Inf | depth == -Inf) = 0;
 depth = imresize(depth, winSize, 'Method', 'box');
-imshow(depth, [-3e-4, 2e-4]);
+imshow(depth, [0, 1.5e-4]);
 colormap jet;
 colorbar;
 fig = gcf;

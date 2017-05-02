@@ -266,25 +266,25 @@ This was run on the matching pairs before the homography estimates were done. To
 \begin{figure}[!ht]
   \captionsetup[subfigure]{position=b}
   \centering
-    \begin{subfigure}{0.45\linewidth}
+    \begin{subfigure}{0.4\linewidth}
       \includegraphics[width=\textwidth]{pic/q2_1_b4_1_2_pair}
       \caption{1 and 2.}
       \label{fig:boatmatch12}
     \end{subfigure}
     ~
-    \begin{subfigure}{0.45\linewidth}
+    \begin{subfigure}{0.4\linewidth}
       \includegraphics[width=\textwidth]{pic/q2_1_b4_1_3_pair}
       \caption{1 and 3.}
       \label{fig:boatmatch13}
   \end{subfigure}
   \\
-  \begin{subfigure}{0.45\linewidth}
+  \begin{subfigure}{0.4\linewidth}
     \includegraphics[width=\textwidth]{pic/q2_1_b4_2_3_pair}
     \caption{2 and 3.}
     \label{fig:boatmatch23}
   \end{subfigure}
   ~
-  \begin{subfigure}{0.45\linewidth}
+  \begin{subfigure}{0.4\linewidth}
     \includegraphics[width=\textwidth]{pic/q2_1_b4_3_4_pair}
     \caption{3 and 4.}
     \label{fig:boatmatch34}
@@ -418,23 +418,28 @@ As such, for A and B, only horizontal lines were searched, as the camera was onl
 \end{figure}
 
 \begin{figure}[!ht]
+  \captionsetup[subfigure]{position=b}
   \centering
-  \includegraphics[width=0.75\linewidth]{pic/q2_2_cd4_dis}
-  \caption{Disparity map for FD1 using FD2, with 10x10 window size. Using horizontal lines.}
-  \vspace{-0.25cm}
-  \label{fig:depth10}
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{pic/q2_2_cd4_dis}
+        \caption{Disparity map.}
+        \label{fig:depth10}
+    \end{subfigure}
+    ~
+    \begin{subfigure}{0.45\linewidth}
+        \includegraphics[width=\linewidth]{pic/q2_2_cd4_depth}
+      	\caption{Depth map. $f = 24\text{mm}$, $b = 20\text{cm}$.}
+        \label{fig:depth}
+    \end{subfigure}
+
+	\caption{FD1 using FD2, with 10x10 window size. Using horizontal lines.}
+    \vspace{-0.5cm}
+  \label{fig:q2_2_cd_4}
 \end{figure}
+
 
 \subsubsection{Depth}
 To convert from disparity to depth ($z$), the formula $z = \frac{fb}{d}$, where $f$ is the focal length, $b$ is the baseline, and $d$ is the disparity. The absolute value of the disparity was taken as there cannot be negative distance. Figure \ref{fig:depth} shows this. The window size empirical chosen for the best result. The results are as expected, with the red portions (a higher depth) being mostly in the centre, around the window and the far side of the kitchen. The left and right parts of the image should be closer, and there is more blue, but there are outliers. A large patch of red is on the left, as is a light green one The fridge is surprisingly blue. Upon closer inspection, the picture does have a lot of uniform white areas (wall, ceiling, fridge), which may have caused issues with feature recognition in earlier segments as well. However, this is again the result of the image, rather than the method, as evidenced by the success of the identical code with the Tsukuba data.
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[width=0.75\linewidth]{pic/q2_2_cd4_depth}
-	\caption{Depth map for FD1 using FD2, with 10x10 window size. $f = 24\text{mm}$, $b = 20\text{cm}$.}
-    \vspace{-0.5cm}
-  \label{fig:depth}
-\end{figure}
 
 \subsubsection{Focal Length and Noise}
 
